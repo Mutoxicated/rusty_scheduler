@@ -1,0 +1,72 @@
+{
+  "monday": {
+    "day_type": "Monday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "tuesday": {
+    "day_type": "Tuesday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "wednesday": {
+    "day_type": "Wednesday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "thursday": {
+    "day_type": "Thursday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "friday": {
+    "day_type": "Friday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "saturday": {
+    "day_type": "Saturday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  },
+  "sunday": {
+    "day_type": "Sunday",
+    "patterns": [
+      {
+        "name": "Goobo",
+        "desc": "Yeah idk what this is.",
+        "time": "15:12"
+      }
+    ]
+  }
+}
