@@ -1,8 +1,8 @@
-use crate::utils::*;
 use crate::time::pattern::Pattern;
+use crate::utils::*;
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq,Hash,Eq)]
+#[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
 pub enum DayType {
     Monday,
     Tuesday,
@@ -14,7 +14,7 @@ pub enum DayType {
     Na,
 }
 
-#[derive(Deserialize, Serialize, Clone,PartialEq,Eq,Hash)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash)]
 pub struct Day {
     pub day_type: DayType,
     pub patterns: Vec<Pattern>,
@@ -41,7 +41,7 @@ impl Day {
         }
     }
 
-    pub fn from_string(string:String) -> DayType{
+    pub fn from_string(string: String) -> DayType {
         let generalized_string = &string.trim().to_lowercase()[0..3];
         //println!("{}",generalized_string);
         match generalized_string {
@@ -56,25 +56,25 @@ impl Day {
         }
     }
 
-    fn pattern_name_exists(&mut self,name:&String)->bool{
-        for pattern in &self.patterns{
-            if pattern.name == *name{
+    fn pattern_name_exists(&mut self, name: &String) -> bool {
+        for pattern in &self.patterns {
+            if pattern.name == *name {
                 return true;
             }
         }
         false
     }
 
-    pub fn add_pattern(&mut self,pattern:&Pattern) {
+    pub fn add_pattern(&mut self, pattern: &Pattern) {
         self.patterns.push(pattern.clone());
     }
 
-    pub fn remove_pattern(&mut self,name:String,all:bool){
-        for i in 0..self.patterns.len(){
-            if self.patterns[i].name == name{
+    pub fn remove_pattern(&mut self, name: String, all: bool) {
+        for i in 0..self.patterns.len() {
+            if self.patterns[i].name == name {
                 self.patterns.remove(i);
                 if !all {
-                    return ()
+                    return ();
                 }
             }
         }

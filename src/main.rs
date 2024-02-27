@@ -1,9 +1,9 @@
+mod arg_parser;
 mod global;
 mod program;
 mod pst_data;
 mod time;
 mod utils;
-mod arg_parser;
 
 use chrono::{Datelike, Local};
 use pst_data::Data;
@@ -42,16 +42,19 @@ fn process_time(time: String) -> String {
 //     println!("{}",(2.0*pow(x+2.0,3))-(17.0*pow(x+2.0,2))+(42.0*(x+2.0))-29.0);
 // }
 
+use colored::Colorize;
 use std::io::stdin;
 use std::thread::sleep;
 use std::time::Duration;
-use colored::Colorize;
 
 fn help() {
     println!("");
     println!("It's important that you understand the vocabulary used in here.");
     println!("");
-    println!("-You add {} to your schedule, which can be thought of as recurring events.","Patterns".yellow());
+    println!(
+        "-You add {} to your schedule, which can be thought of as recurring events.",
+        "Patterns".yellow()
+    );
     println!("-You can also add {} to your schedule, which are not recurring and \nwill get removed from the schedule once they happen.","Special Events".green());
     println!("");
     println!("--- COMMANDS ---");
@@ -70,7 +73,7 @@ fn help() {
     println!("(note: you can put 'today' in [day])")
 }
 
-use program::{Program,Receive};
+use program::{Program, Receive};
 
 fn main() {
     let mut pr = Program::new();

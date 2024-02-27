@@ -1,12 +1,12 @@
+use crate::program::Program;
 use crate::time::day::Day;
 use crate::time::day::DayType as dt;
+use crate::time::ScheduleData;
 use file_into_string::*;
 use serde_json;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
-use crate::time::ScheduleData;
-use crate::program::Program;
 
 use lazy_static::lazy_static;
 lazy_static! {

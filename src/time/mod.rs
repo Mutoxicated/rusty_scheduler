@@ -1,5 +1,5 @@
 pub mod day;
-mod schedule;
 mod pattern;
+mod schedule;
 
 pub use schedule::ScheduleData;

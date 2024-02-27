@@ -1,17 +1,21 @@
 use serde_derive::{Deserialize, Serialize};
 
-
-#[derive(Deserialize, Serialize, Clone,PartialEq, Eq,Hash)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash)]
 pub struct Pattern {
     pub name: String,
     pub desc: String,
     pub time: String,
-    pub special: bool
+    pub special: bool,
 }
 
 impl Pattern {
-    pub fn new(name: String, desc: String, time: String, special:bool) -> Self {
-        Self { name, desc, time, special }
+    pub fn new(name: String, desc: String, time: String, special: bool) -> Self {
+        Self {
+            name,
+            desc,
+            time,
+            special,
+        }
     }
 
     pub fn new_empty() -> Self {
@@ -19,7 +23,7 @@ impl Pattern {
             name: String::new(),
             desc: String::new(),
             time: String::new(),
-            special: false
+            special: false,
         }
     }
 
@@ -33,9 +37,9 @@ impl Pattern {
 
     pub fn present(&self) {
         println!("|");
-        if self.desc == ""{
+        if self.desc == "" {
             println!("|_ {} - {}", self.time, self.name);
-        }else{
+        } else {
             println!("|_ {} - {} - {}", self.time, self.name, self.desc);
         }
     }

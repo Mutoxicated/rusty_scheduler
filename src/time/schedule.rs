@@ -1,8 +1,8 @@
-use crate::time::day::{Day,DayType as dt};
-use crate::time::pattern::Pattern;
-use serde_derive::{Deserialize,Serialize};
 use crate::program::Receive;
+use crate::time::day::{Day, DayType as dt};
+use crate::time::pattern::Pattern;
 use crate::utils::*;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
@@ -38,7 +38,7 @@ impl ScheduleData {
         self.sunday = other.sunday.clone();
     }
 
-    pub fn get_day(&mut self,day_type:dt)->Result<&mut Day, ()>{
+    pub fn get_day(&mut self, day_type: dt) -> Result<&mut Day, ()> {
         match day_type {
             dt::Monday => Ok(&mut self.monday),
             dt::Tuesday => Ok(&mut self.tuesday),
@@ -51,7 +51,7 @@ impl ScheduleData {
         }
     }
 
-    pub fn get_day_string(&mut self,day_type:String)->Result<&mut Day, ()>{
+    pub fn get_day_string(&mut self, day_type: String) -> Result<&mut Day, ()> {
         let generalized_string = &day_type.trim().to_lowercase()[0..3];
         match generalized_string {
             "mon" => Ok(&mut self.monday),
@@ -65,7 +65,7 @@ impl ScheduleData {
         }
     }
 
-    pub fn add_pattern(&mut self, days:&mut Vec<String>){
+    pub fn add_pattern(&mut self, days: &mut Vec<String>) {
         if days.len() == 0 {
             let input = assign_str_from_input("Please give 1 or multiple day(s).");
             *days = parse_arguments(&input);
@@ -80,18 +80,18 @@ impl ScheduleData {
             pattern.desc = assign_str_from_input("Please provide a description.");
         }
 
-        let mut valid_days:Vec<dt> = Vec::new();
+        let mut valid_days: Vec<dt> = Vec::new();
 
         for day in days {
             let res = self.get_day_string(day.clone());
-            if let Err(_) = res{
+            if let Err(_) = res {
                 continue;
             }
             valid_days.push(Day::from_string(day.clone()));
             res.unwrap().add_pattern(&pattern);
         }
 
-        println!("Event '{}' added to {:?}!",pattern.name,valid_days);
+        println!("Event '{}' added to {:?}!", pattern.name, valid_days);
     }
 
     // pub fn update_day(&mut self,day:Day){
@@ -110,22 +110,22 @@ impl ScheduleData {
 
 impl Receive for ScheduleData {
     fn receive(&mut self, input: String) {
-        let mut parameterless_command:String = input.clone();
+        let mut parameterless_command: String = input.clone();
         let mut parameters = String::new();
         let index_at_space = parameterless_command.find(" ");
         if let Some(i) = index_at_space {
-            parameters = input[i+1..input.len()].to_string();
+            parameters = input[i + 1..input.len()].to_string();
             parameterless_command.replace_range(i..input.len(), "");
         }
         let mut args = parse_arguments(&parameters);
 
         //println!("{:?}",args);
-        
-        match parameterless_command.as_str(){
+
+        match parameterless_command.as_str() {
             "add_pattern" => {
                 self.add_pattern(&mut args);
             }
-            _ => ()
+            _ => (),
         }
     }
 }

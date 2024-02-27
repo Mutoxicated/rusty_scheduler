@@ -1,21 +1,21 @@
 use crate::pst_data::Data;
-use crate::time::ScheduleData;
 use crate::time::day::DayType;
+use crate::time::ScheduleData;
 
 pub trait Receive {
-    fn receive(&mut self,input: String);
+    fn receive(&mut self, input: String);
 }
 
 pub struct Program {
     pub data: ScheduleData,
-    pub today: DayType
+    pub today: DayType,
 }
 
 impl Program {
     pub fn new() -> Self {
         Self {
             data: ScheduleData::new(),
-            today: DayType::Na
+            today: DayType::Na,
         }
     }
 
@@ -27,7 +27,7 @@ impl Program {
 }
 
 impl Receive for Program {
-    fn receive(&mut self,input: String) {
+    fn receive(&mut self, input: String) {
         self.data.receive(input);
     }
 }
