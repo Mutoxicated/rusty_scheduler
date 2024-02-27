@@ -1,21 +1,22 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": [
-      {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
-      }
-    ]
+    "patterns": []
   },
   "tuesday": {
     "day_type": "Tuesday",
     "patterns": [
       {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
+        "name": "Ko",
+        "desc": "",
+        "time": "14:12",
+        "special": false
+      },
+      {
+        "name": "rt",
+        "desc": "",
+        "time": "12:12",
+        "special": false
       }
     ]
   },
@@ -23,50 +24,27 @@
     "day_type": "Wednesday",
     "patterns": [
       {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
+        "name": "rt",
+        "desc": "",
+        "time": "12:12",
+        "special": false
       }
     ]
   },
   "thursday": {
     "day_type": "Thursday",
-    "patterns": [
-      {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
-      }
-    ]
+    "patterns": []
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": [
-      {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
-      }
-    ]
+    "patterns": []
   },
   "saturday": {
     "day_type": "Saturday",
-    "patterns": [
-      {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
-      }
-    ]
+    "patterns": []
   },
   "sunday": {
     "day_type": "Sunday",
-    "patterns": [
-      {
-        "name": "Goobo",
-        "desc": "Yeah idk what this is.",
-        "time": "15:12"
-      }
-    ]
+    "patterns": []
   }
 }

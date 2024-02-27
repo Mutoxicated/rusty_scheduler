@@ -1,33 +1,42 @@
 use serde_derive::{Deserialize, Serialize};
-//use crate::global;
 
-#[derive(Deserialize,Serialize,Clone)]
+
+#[derive(Deserialize, Serialize, Clone,PartialEq, Eq,Hash)]
 pub struct Pattern {
-    pub name:String,
-    pub desc:String,
-    pub time:String,
+    pub name: String,
+    pub desc: String,
+    pub time: String,
+    pub special: bool
 }
 
 impl Pattern {
-    pub fn new(name:String, desc:String,time:String) -> Self{
+    pub fn new(name: String, desc: String, time: String, special:bool) -> Self {
+        Self { name, desc, time, special }
+    }
+
+    pub fn new_empty() -> Self {
         Self {
-            name,
-            desc,
-            time,
+            name: String::new(),
+            desc: String::new(),
+            time: String::new(),
+            special: false
         }
     }
 
-    pub fn is_ready(&self, current_time:String) -> bool{
+    pub fn is_ready(&self, current_time: String) -> bool {
         if self.time == current_time {
             true
-        }else{
+        } else {
             false
         }
     }
 
-    pub fn present(&self){
+    pub fn present(&self) {
         println!("|");
-        println!("|_ {} - {} - {}",self.time,self.name,self.desc);
-        println!("");
+        if self.desc == ""{
+            println!("|_ {} - {}", self.time, self.name);
+        }else{
+            println!("|_ {} - {} - {}", self.time, self.name, self.desc);
+        }
     }
 }
