@@ -31,6 +31,7 @@ impl ProgramInfo {
 
     pub fn finish(&mut self) {
         self.steps = -1;
+        self.command_finished = true;
     }
 }
 

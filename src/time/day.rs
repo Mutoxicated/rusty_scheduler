@@ -67,6 +67,10 @@ impl Day {
             _ => DayType::Na,
         }
     }
+    
+    fn chronologicalize(&mut self){
+        self.patterns.sort();
+    }
 
     fn pattern_name_exists(&mut self, name: &String) -> bool {
         for pattern in &self.patterns {
@@ -79,6 +83,7 @@ impl Day {
 
     pub fn add_pattern(&mut self, pattern: &Pattern) {
         self.patterns.push(pattern.clone());
+        self.chronologicalize();
     }
 
     pub fn remove_pattern(&mut self, name: String, all: bool) {

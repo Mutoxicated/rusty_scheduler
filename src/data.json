@@ -1,0 +1,74 @@
+{
+  "monday": {
+    "day_type": "Monday",
+    "patterns": [
+      {
+        "name": "asfgber",
+        "desc": "",
+        "time": "13:00",
+        "special": false
+      }
+    ]
+  },
+  "tuesday": {
+    "day_type": "Tuesday",
+    "patterns": []
+  },
+  "wednesday": {
+    "day_type": "Wednesday",
+    "patterns": [
+      {
+        "name": "oiwe",
+        "desc": "",
+        "time": "1:20",
+        "special": false
+      },
+      {
+        "name": "asd",
+        "desc": "",
+        "time": "14:00",
+        "special": false
+      },
+      {
+        "name": "oi",
+        "desc": "",
+        "time": "18:40",
+        "special": false
+      },
+      {
+        "name": "we",
+        "desc": "",
+        "time": "19:01",
+        "special": false
+      },
+      {
+        "name": "ko",
+        "desc": "",
+        "time": "19:19",
+        "special": false
+      },
+      {
+        "name": "qwaedfv",
+        "desc": "",
+        "time": "23:01",
+        "special": false
+      }
+    ]
+  },
+  "thursday": {
+    "day_type": "Thursday",
+    "patterns": []
+  },
+  "friday": {
+    "day_type": "Friday",
+    "patterns": []
+  },
+  "saturday": {
+    "day_type": "Saturday",
+    "patterns": []
+  },
+  "sunday": {
+    "day_type": "Sunday",
+    "patterns": []
+  }
+}

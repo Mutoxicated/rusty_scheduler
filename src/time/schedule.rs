@@ -3,6 +3,7 @@ use crate::program::{ProgramInfo, Receive};
 use crate::time::day::DayType;
 use crate::time::day::{Day, DayType as dt};
 use crate::utils::*;
+use crate::arg_parser::ArgError;
 use colored::{Colorize, CustomColor};
 use serde_derive::{Deserialize, Serialize};
 
@@ -73,8 +74,13 @@ impl ScheduleData {
         let args = &pri.args;
 
         let mut valid_days: Vec<dt> = Vec::new();
-        for day in &args.days {
-            let res = Day::from_string(day);
+        if let Err(er) = &args.days {
+            println!("{er}");
+            pri.finish();
+            return;
+        }
+        for day in &<Result<Vec<std::string::String>, ArgError> as Clone>::clone(&args.days).unwrap() {
+            let res = Day::from_string(&day.clone());
             if res == DayType::Na {
                 continue;
             }
@@ -82,10 +88,7 @@ impl ScheduleData {
         }
 
         if valid_days.len() == 0 {
-            println!(
-                "{} You didn't provide any days or the days you provided are not valid!",
-                "Error!".red()
-            );
+            println!("{}",ArgError::DayFormat);
             pri.finish();
             return;
         }
@@ -93,7 +96,13 @@ impl ScheduleData {
         pri.steps = pri.steps + 1;
 
         if pri.steps == 3 {
-            pri.input_pattern.time = pri.input.clone();
+            let formatted_time = format_time(pri.input.as_str());
+            if let Err(x) = formatted_time {
+                println!("{x}");
+                pri.finish();
+                return;
+            }
+            pri.input_pattern.time = formatted_time.unwrap();
             println!(
                 "Please provide a description. {}",
                 "(you can leave it empty)".custom_color(*GREY)
@@ -118,8 +127,6 @@ impl ScheduleData {
             println!("Is the event a special event?");
             return;
         }
-
-        pri.command_finished = true;
 
         for valid_day in &mut valid_days {
             self.get_day(valid_day.clone())
