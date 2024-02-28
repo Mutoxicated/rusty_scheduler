@@ -110,7 +110,12 @@ impl ScheduleData {
             return;
         }
         if pri.steps == 2 {
-            pri.input_pattern.name = pri.input.clone();
+            if let Err(e) = &args.name {
+                println!("{e}");
+                pri.finish();
+                return;
+            }
+            pri.input_pattern.name = <Result<String, ArgError> as Clone>::clone(&args.name).unwrap();
             println!(
                 "What time? {}",
                 "(please use the 24 hour format)".custom_color(*GREY)

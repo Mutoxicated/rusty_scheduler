@@ -126,6 +126,10 @@ impl Args {
             name = str.trim().to_string();
         }
 
+        if name != ""{
+            res_name = Ok(name);
+        }
+
         let res = Self { name:res_name, days:res_days, all };
 
         //println!("{res:?}");
