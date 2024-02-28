@@ -1,35 +1,35 @@
+use crate::arg_parser::Args;
 use crate::pst_data::Data;
 use crate::time::day::DayType;
-use crate::time::ScheduleData;
 use crate::time::Pattern;
-use crate::arg_parser::Args;
+use crate::time::ScheduleData;
 
 pub trait Receive {
-    fn receive<'a>(&mut self, pr:&mut ProgramInfo);
+    fn receive<'a>(&mut self, pr: &mut ProgramInfo);
 }
 
 pub struct ProgramInfo {
-    pub command_name:String,
-    pub args:Args,
-    pub input_pattern:Pattern,
-    pub command_finished:bool,
-    pub input:String,
-    pub steps:i32
+    pub command_name: String,
+    pub args: Args,
+    pub input_pattern: Pattern,
+    pub command_finished: bool,
+    pub input: String,
+    pub steps: i32,
 }
 
 impl ProgramInfo {
     pub fn new() -> Self {
         Self {
-            args:Args::empty(),
-            command_name:String::new(),
-            input_pattern:Pattern::new_empty(),
-            command_finished:true,
-            input:String::new(),
-            steps:-1,
+            args: Args::empty(),
+            command_name: String::new(),
+            input_pattern: Pattern::new_empty(),
+            command_finished: true,
+            input: String::new(),
+            steps: -1,
         }
     }
 
-    pub fn finish(&mut self){
+    pub fn finish(&mut self) {
         self.steps = -1;
     }
 }
@@ -37,14 +37,14 @@ impl ProgramInfo {
 #[derive(Clone)]
 pub struct Program {
     pub data: ScheduleData,
-    pub today: DayType
+    pub today: DayType,
 }
 
 impl Program {
     pub fn new() -> Self {
         Self {
             data: ScheduleData::new(),
-            today: DayType::Na
+            today: DayType::Na,
         }
     }
 
@@ -55,7 +55,7 @@ impl Program {
         std::process::exit(0);
     }
 
-    pub fn receive<'a>(&mut self, pri:&mut ProgramInfo, input:&String){
+    pub fn receive(&mut self, pri: &mut ProgramInfo, input: &String) {
         pri.input = input.clone();
         if pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel" {
             println!("Stopped Command.");

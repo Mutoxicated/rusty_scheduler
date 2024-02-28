@@ -1,6 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash,Debug)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Pattern {
     pub name: String,
     pub desc: String,

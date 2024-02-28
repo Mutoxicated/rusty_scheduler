@@ -1,10 +1,10 @@
+use crate::global::*;
 use crate::program::{ProgramInfo, Receive};
+use crate::time::day::DayType;
 use crate::time::day::{Day, DayType as dt};
 use crate::utils::*;
-use serde_derive::{Deserialize, Serialize};
 use colored::{Colorize, CustomColor};
-use crate::global::*;
-use crate::time::day::DayType;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
@@ -67,11 +67,9 @@ impl ScheduleData {
         }
     }
 
-    pub fn remove_pattern(&mut self, pri:&mut ProgramInfo){
+    pub fn remove_pattern(&mut self, pri: &mut ProgramInfo) {}
 
-    }
-
-    pub fn add_pattern(&mut self, pri:&mut ProgramInfo) {
+    pub fn add_pattern(&mut self, pri: &mut ProgramInfo) {
         let args = &pri.args;
 
         let mut valid_days: Vec<dt> = Vec::new();
@@ -84,7 +82,10 @@ impl ScheduleData {
         }
 
         if valid_days.len() == 0 {
-            println!("{} You didn't provide any days or the days you provided are not valid!","Error!".red());
+            println!(
+                "{} You didn't provide any days or the days you provided are not valid!",
+                "Error!".red()
+            );
             pri.finish();
             return;
         }
@@ -93,12 +94,18 @@ impl ScheduleData {
 
         if pri.steps == 3 {
             pri.input_pattern.time = pri.input.clone();
-            println!("Please provide a description. {}","(you can leave it empty)".custom_color(*GREY));
+            println!(
+                "Please provide a description. {}",
+                "(you can leave it empty)".custom_color(*GREY)
+            );
             return;
         }
         if pri.steps == 2 {
             pri.input_pattern.name = pri.input.clone();
-            println!("What time? {}","(please use the 24 hour format)".custom_color(*GREY));
+            println!(
+                "What time? {}",
+                "(please use the 24 hour format)".custom_color(*GREY)
+            );
             return;
         }
         if pri.steps == 1 {
@@ -106,27 +113,33 @@ impl ScheduleData {
             println!("What is the name of the pattern?");
             return;
         }
-        if pri.steps == 0{
+        if pri.steps == 0 {
             pri.command_finished = false;
             println!("Is the event a special event?");
             return;
         }
 
         pri.command_finished = true;
-        
+
         for valid_day in &mut valid_days {
-            self.get_day(valid_day.clone()).unwrap().add_pattern(&pri.input_pattern);
+            self.get_day(valid_day.clone())
+                .unwrap()
+                .add_pattern(&pri.input_pattern);
         }
 
         pri.finish();
-        println!("{} '{}' added to {:?}!", "Pattern".yellow(),pri.input_pattern.name, valid_days);
+        println!(
+            "{} '{}' added to {:?}!",
+            "Pattern".yellow(),
+            pri.input_pattern.name,
+            valid_days
+        );
     }
 }
 
 impl Receive for ScheduleData {
-    fn receive(&mut self, mut pri:&mut ProgramInfo) {
-
-        println!("Debug: Command Name->{}",pri.command_name);
+    fn receive(&mut self, mut pri: &mut ProgramInfo) {
+        println!("Debug: Command Name->{}", pri.command_name);
 
         match pri.command_name.as_str() {
             "add_pattern" => {

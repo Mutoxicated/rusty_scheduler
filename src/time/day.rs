@@ -17,7 +17,7 @@ pub enum DayType {
 
 impl Display for Day {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{:?}",self.day_type)).unwrap();
+        f.write_fmt(format_args!("{:?}", self.day_type)).unwrap();
         Ok(())
     }
 }

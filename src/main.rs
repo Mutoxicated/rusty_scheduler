@@ -70,11 +70,18 @@ fn help() {
     println!("Example: add_pattern [Monday,Tuesday]");
     println!("Example: copy_pattern [Sunday] Basketball");
     println!("");
-    println!("{}","(note: you can put 'today' in [day])".custom_color(*GREY));
-    println!("{}","(note: in the <all> parameter, you either put nothing or the word 'all')".custom_color(*GREY));
+    println!(
+        "{}",
+        "(note: you can put 'today' in [day])".custom_color(*GREY)
+    );
+    println!(
+        "{}",
+        "(note: in the <all> parameter, you either put nothing or the word 'all')"
+            .custom_color(*GREY)
+    );
 }
 
-use program::{Program,ProgramInfo};
+use program::{Program, ProgramInfo};
 
 use crate::global::GREY;
 
@@ -130,7 +137,7 @@ fn main() {
 
     println!("{day_type:?}");
     pr.data.get_day(day_type).unwrap().present_patterns();
-    
+
     println!("Type 'help' if you're unfamiliar with the commands.");
 
     let mut input: String = String::new();
@@ -144,7 +151,7 @@ fn main() {
             _ => (),
         };
 
-        pr.receive(&mut pri,&input.trim().to_string());
+        pr.receive(&mut pri, &input.trim().to_string());
 
         input.clear();
     }
