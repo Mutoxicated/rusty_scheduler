@@ -1,5 +1,6 @@
+use std::fmt::Display;
+
 use crate::time::pattern::Pattern;
-use crate::utils::*;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
@@ -14,7 +15,14 @@ pub enum DayType {
     Na,
 }
 
-#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash)]
+impl Display for Day {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{:?}",self.day_type)).unwrap();
+        Ok(())
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Day {
     pub day_type: DayType,
     pub patterns: Vec<Pattern>,
@@ -41,8 +49,12 @@ impl Day {
         }
     }
 
-    pub fn from_string(string: String) -> DayType {
-        let generalized_string = &string.trim().to_lowercase()[0..3];
+    pub fn from_string(string: &String) -> DayType {
+        let mut max = string.len();
+        if max > 3 {
+            max = 3
+        }
+        let generalized_string = &string.trim().to_lowercase()[0..max];
         //println!("{}",generalized_string);
         match generalized_string {
             "mon" => DayType::Monday,

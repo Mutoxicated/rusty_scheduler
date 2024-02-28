@@ -1,26 +1,39 @@
-struct Args {
-    //TO-DO: Use this in the schedule module
-    name: String,
-    unparsed_days: Vec<String>,
+#[derive(Debug)]
+pub struct Args {
+    pub name: String,
+    pub days: Vec<String>,
+    pub all:bool
 }
 
 impl Args {
+    pub fn empty() -> Self{
+        Self {
+            name:String::new(),
+            days: Vec::new(),
+            all:false
+        }
+    }
+
     pub fn get_args(string: &String) -> Self {
         let mut days: Vec<String> = Vec::new();
         let mut name: String = String::new();
+        let mut all:bool = false;
 
-        let str = string.clone();
-        let mut index: Option<usize> = Some(0usize);
-        let mut index2: Option<usize> = Some(0usize);
+        let mut str = string.clone();
+        let index: Option<usize>;
+        let index2: Option<usize>;
 
-        let mut unparsed_days: String = String::new();
+        let mut unparsed_days: String;
 
         let (mut array_starts, mut array_ends) = (true, true);
+
+        let mut anchor:&str = " ";
 
         if str == "" {
             return Self {
                 name,
-                unparsed_days: days,
+                days,
+                all
             };
         }
 
@@ -28,46 +41,69 @@ impl Args {
         index2 = str.find("]");
 
         if let None = index {
-            array_starts = true;
+            array_starts = false;
         }
         if let None = index2 {
-            array_ends = true;
+            array_ends = false;
         }
 
         if array_starts && array_ends {
-            let mut temp_i: Option<usize> = Some(0usize);
-            let mut temp_i2 = temp_i.clone();
-            unparsed_days = str[index.unwrap() + 1..index2.unwrap() - 1].to_string();
+            let mut temp_i: Option<usize>;
+
+            unparsed_days = str[index.unwrap() + 1..index2.unwrap()].to_string();
 
             for _ in 0..7 {
-                temp_i = unparsed_days.find(" ");
+                temp_i = unparsed_days.find(anchor);
+                println!("{:?}",temp_i);
+                if let None = temp_i {
+                    anchor = ",";
+                    temp_i = unparsed_days.find(anchor);
+                }
                 if let None = temp_i {
                     break;
                 }
-                if temp_i2.unwrap() == temp_i.unwrap() {
+                if 0 == temp_i.unwrap() {
                     continue;
                 }
 
-                days.push(unparsed_days[temp_i2.unwrap()..temp_i.unwrap()].to_string());
+                days.push(unparsed_days[0..temp_i.unwrap()-1].to_string());
 
-                unparsed_days.replace_range(temp_i2.unwrap()..temp_i.unwrap() + 1, "");
-
-                temp_i2 = temp_i;
+                unparsed_days.replace_range(0..temp_i.unwrap(), "");
+                unparsed_days = unparsed_days.trim().to_string();
+                println!("Debug: unparsed days-> {}",unparsed_days);
             }
 
             if unparsed_days != "" {
                 days.push(unparsed_days.clone());
             }
 
+            str.replace_range(index.unwrap()..index2.unwrap()+1, "");
+
+            let mut end_name = str.find(" ");
+
+            if end_name == None {
+                end_name = Some(str.len());
+            }else{
+                let all_string = str[end_name.unwrap()..str.len()].trim();
+                all = all_string.contains("all");
+            }
+
             //name
-            name = str[index2.unwrap() + 1..str.len()].trim().to_string();
+            name = str[0..end_name.unwrap()].trim().to_string();
+
+
         } else if !array_starts && !array_ends {
             name = str.trim().to_string();
         }
 
-        Self {
+        let res  = Self {
             name,
-            unparsed_days: days,
-        }
+            days,
+            all
+        };
+
+        println!("{res:?}");
+
+        res
     }
 }

@@ -1,15 +1,15 @@
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash,Debug)]
 pub struct Pattern {
     pub name: String,
     pub desc: String,
     pub time: String,
-    pub special: bool,
+    pub special: Option<bool>,
 }
 
 impl Pattern {
-    pub fn new(name: String, desc: String, time: String, special: bool) -> Self {
+    pub fn new(name: String, desc: String, time: String, special: Option<bool>) -> Self {
         Self {
             name,
             desc,
@@ -23,7 +23,7 @@ impl Pattern {
             name: String::new(),
             desc: String::new(),
             time: String::new(),
-            special: false,
+            special: Some(false),
         }
     }
 

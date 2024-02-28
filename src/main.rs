@@ -48,7 +48,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 fn help() {
-    println!("");
+    println!("|");
     println!("It's important that you understand the vocabulary used in here.");
     println!("");
     println!(
@@ -60,26 +60,30 @@ fn help() {
     println!("--- COMMANDS ---");
     println!("-get_schedule [optional:day(s)]");
     println!("-add_pattern [day(s)]");
-    println!("-remove_pattern [day(s)] <optional:name>");
+    println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
     println!("-change_pattern [day(s)] <optional:name>");
     println!("-clear_patterns [day(s)]");
     println!("-copy_pattern [day] <optional:name>");
     println!("-paste_pattern [day(s)]");
     println!("-find_pattern <optional:name>");
-
+    println!("");
     println!("Example: add_pattern [Monday,Tuesday]");
     println!("Example: copy_pattern [Sunday] Basketball");
-
-    println!("(note: you can put 'today' in [day])")
+    println!("");
+    println!("{}","(note: you can put 'today' in [day])".custom_color(*GREY));
+    println!("{}","(note: in the <all> parameter, you either put nothing or the word 'all')".custom_color(*GREY));
 }
 
-use program::{Program, Receive};
+use program::{Program,ProgramInfo};
+
+use crate::global::GREY;
 
 fn main() {
     let mut pr = Program::new();
+    let mut pri = ProgramInfo::new();
+
     //pr.data.receive("-remove_pattern Monday Goobo".to_string());
-    let test = &mut pr;
-    Data::read(test);
+    Data::read(&mut pr);
 
     let mut input: String = String::new();
     let logo_lines: Vec<&str> = vec![
@@ -126,6 +130,7 @@ fn main() {
 
     println!("{day_type:?}");
     pr.data.get_day(day_type).unwrap().present_patterns();
+    
     println!("Type 'help' if you're unfamiliar with the commands.");
 
     let mut input: String = String::new();
@@ -137,9 +142,9 @@ fn main() {
             "help" => help(),
             "exit" => pr.exit(),
             _ => (),
-        }
+        };
 
-        pr.receive(input.trim().to_string());
+        pr.receive(&mut pri,&input.trim().to_string());
 
         input.clear();
     }

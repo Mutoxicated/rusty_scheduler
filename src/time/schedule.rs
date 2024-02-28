@@ -1,8 +1,10 @@
-use crate::program::Receive;
+use crate::program::{ProgramInfo, Receive};
 use crate::time::day::{Day, DayType as dt};
-use crate::time::pattern::Pattern;
 use crate::utils::*;
 use serde_derive::{Deserialize, Serialize};
+use colored::{Colorize, CustomColor};
+use crate::global::*;
+use crate::time::day::DayType;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
@@ -65,65 +67,70 @@ impl ScheduleData {
         }
     }
 
-    pub fn add_pattern(&mut self, days: &mut Vec<String>) {
-        if days.len() == 0 {
-            let input = assign_str_from_input("Please give 1 or multiple day(s).");
-            *days = parse_arguments(&input);
-        }
+    pub fn remove_pattern(&mut self, pri:&mut ProgramInfo){
 
-        let mut pattern: Pattern = Pattern::new_empty();
-        pattern.name = assign_str_from_input("What is the name of the event?");
-        pattern.time = assign_str_from_input("What time is the event gonna happen?");
-        pattern.special = yes_or_no("Is it a special event?");
-        let answer = yes_or_no("Would you like to provide a description for the event?");
-        if answer {
-            pattern.desc = assign_str_from_input("Please provide a description.");
-        }
-
-        let mut valid_days: Vec<dt> = Vec::new();
-
-        for day in days {
-            let res = self.get_day_string(day.clone());
-            if let Err(_) = res {
-                continue;
-            }
-            valid_days.push(Day::from_string(day.clone()));
-            res.unwrap().add_pattern(&pattern);
-        }
-
-        println!("Event '{}' added to {:?}!", pattern.name, valid_days);
     }
 
-    // pub fn update_day(&mut self,day:Day){
-    //     match day.day_type {
-    //         dt::Monday => self.monday = day,
-    //         dt::Tuesday => self.tuesday = day,
-    //         dt::Wednesday => self.wednesday = day,
-    //         dt::Thursday => self.thursday = day,
-    //         dt::Friday => self.friday = day,
-    //         dt::Saturday => self.saturday = day,
-    //         dt::Sunday => self.sunday = day,
-    //         _ => (),
-    //     }
-    // }
+    pub fn add_pattern(&mut self, pri:&mut ProgramInfo) {
+        let args = &pri.args;
+
+        let mut valid_days: Vec<dt> = Vec::new();
+        for day in &args.days {
+            let res = Day::from_string(day);
+            if res == DayType::Na {
+                continue;
+            }
+            valid_days.push(res);
+        }
+
+        if valid_days.len() == 0 {
+            println!("{} You didn't provide any days or the days you provided are not valid!","Error!".red());
+            pri.finish();
+            return;
+        }
+
+        pri.steps = pri.steps + 1;
+
+        if pri.steps == 3 {
+            pri.input_pattern.time = pri.input.clone();
+            println!("Please provide a description. {}","(you can leave it empty)".custom_color(*GREY));
+            return;
+        }
+        if pri.steps == 2 {
+            pri.input_pattern.name = pri.input.clone();
+            println!("What time? {}","(please use the 24 hour format)".custom_color(*GREY));
+            return;
+        }
+        if pri.steps == 1 {
+            pri.input_pattern.special = Some(yes_or_no(pri.input.clone()));
+            println!("What is the name of the pattern?");
+            return;
+        }
+        if pri.steps == 0{
+            pri.command_finished = false;
+            println!("Is the event a special event?");
+            return;
+        }
+
+        pri.command_finished = true;
+        
+        for valid_day in &mut valid_days {
+            self.get_day(valid_day.clone()).unwrap().add_pattern(&pri.input_pattern);
+        }
+
+        pri.finish();
+        println!("{} '{}' added to {:?}!", "Pattern".yellow(),pri.input_pattern.name, valid_days);
+    }
 }
 
 impl Receive for ScheduleData {
-    fn receive(&mut self, input: String) {
-        let mut parameterless_command: String = input.clone();
-        let mut parameters = String::new();
-        let index_at_space = parameterless_command.find(" ");
-        if let Some(i) = index_at_space {
-            parameters = input[i + 1..input.len()].to_string();
-            parameterless_command.replace_range(i..input.len(), "");
-        }
-        let mut args = parse_arguments(&parameters);
+    fn receive(&mut self, mut pri:&mut ProgramInfo) {
 
-        //println!("{:?}",args);
+        println!("Debug: Command Name->{}",pri.command_name);
 
-        match parameterless_command.as_str() {
+        match pri.command_name.as_str() {
             "add_pattern" => {
-                self.add_pattern(&mut args);
+                self.add_pattern(&mut pri);
             }
             _ => (),
         }
