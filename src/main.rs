@@ -6,84 +6,13 @@ mod time;
 mod utils;
 
 use chrono::{Datelike, Local};
-use pst_data::Data;
-use time::day::Day;
-use utils::milli_to_nano;
-
-fn process_time(time: String) -> String {
-    let mut new_time: String = time;
-
-    let length: usize = new_time.chars().count();
-
-    let mut index = length;
-
-    for _ in 0..length {
-        index = index - 1;
-        //println!("{}",new_time.chars().nth(index).unwrap());
-        if new_time.chars().nth(index).unwrap() == ':' {
-            new_time.remove(index);
-            return new_time;
-        }
-        new_time.remove(index);
-    }
-
-    new_time
-}
-
-// fn pow(x:f32,y:usize)->f32{
-//     let mut result = x;
-//     for i in 0..y-1{
-//         result = result * result;
-//     }
-//     result
-// }
-
-// fn f(x:f32){
-//     println!("{}",(2.0*pow(x+2.0,3))-(17.0*pow(x+2.0,2))+(42.0*(x+2.0))-29.0);
-// }
-
-use colored::Colorize;
-use std::io::stdin;
-use std::thread::sleep;
-use std::time::Duration;
-
-fn help() {
-    println!("|");
-    println!("It's important that you understand the vocabulary used in here.");
-    println!("");
-    println!(
-        "-You add {} to your schedule, which can be thought of as recurring events.",
-        "Patterns".yellow()
-    );
-    println!("-You can also add {} to your schedule, which are not recurring and \nwill get removed from the schedule once they happen.","Special Events".green());
-    println!("");
-    println!("--- COMMANDS ---");
-    println!("-get_schedule [optional:day(s)]");
-    println!("-add_pattern [day(s)]");
-    println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
-    println!("-change_pattern [day(s)] <optional:name>");
-    println!("-clear_patterns [day(s)]");
-    println!("-copy_pattern [day] <optional:name>");
-    println!("-paste_pattern [day(s)]");
-    println!("-find_pattern <optional:name>");
-    println!("");
-    println!("Example: add_pattern [Monday,Tuesday]");
-    println!("Example: copy_pattern [Sunday] Basketball");
-    println!("");
-    println!(
-        "{}",
-        "(note: you can put 'today' in [day])".custom_color(*GREY)
-    );
-    println!(
-        "{}",
-        "(note: in the <all> parameter, you either put nothing or the word 'all')"
-            .custom_color(*GREY)
-    );
-}
-
+use colored::{ColoredString, Colorize};
+use global::*;
 use program::{Program, ProgramInfo};
-
-use crate::global::GREY;
+use pst_data::Data;
+use std::{io::stdin, thread::sleep, time::Duration};
+use time::day::Day;
+use utils::{help, milli_to_nano, process_time};
 
 fn main() {
     let mut pr = Program::new();
@@ -93,26 +22,25 @@ fn main() {
     Data::read(&mut pr);
 
     let mut input: String = String::new();
-    let logo_lines: Vec<&str> = vec![
-        r"   ____              __       ",
-        r"   / __ \__  _______/ /___  __",
-        r"  / /_/ / / / / ___/ __/ / / /",
-        r" / _, _/ /_/ (__  ) /_/ /_/ / ",
-        r"/_/ |_|\__,_/____/\__/\__, /  ",
-        r"                     /____/   ",
-        r"   _____      __             __      __         ",
-        r"  / ___/_____/ /_  ___  ____/ /_  __/ /__  _____",
-        r"  \__ \/ ___/ __ \/ _ \/ __  / / / / / _ \/ ___/",
-        r" ___/ / /__/ / / /  __/ /_/ / /_/ / /  __/ /    ",
-        r"/____/\___/_/ /_/\___/\__,_/\__,_/_/\___/_/     ",
-        r"                                                  ",
+    let logo_lines: Vec<ColoredString> = vec![
+        r"   ____              __       ".custom_color(*RUSTY),
+        r"   / __ \__  _______/ /___  __".custom_color(*RUSTY),
+        r"  / /_/ / / / / ___/ __/ / / /".custom_color(*RUSTY),
+        r" / _, _/ /_/ (__  ) /_/ /_/ / ".custom_color(*RUSTY),
+        r"/_/ |_|\__,_/____/\__/\__, /  ".custom_color(*RUSTY),
+        r"                     /____/   ".custom_color(*RUSTY),
+        r"   _____      __             __      __         ".custom_color(*LIGHTBLUE),
+        r"  / ___/_____/ /_  ___  ____/ /_  __/ /__  _____".custom_color(*LIGHTBLUE),
+        r"  \__ \/ ___/ __ \/ _ \/ __  / / / / / _ \/ ___/".custom_color(*LIGHTBLUE),
+        r" ___/ / /__/ / / /  __/ /_/ / /_/ / /  __/ /    ".custom_color(*LIGHTBLUE),
+        r"/____/\___/_/ /_/\___/\__,_/\__,_/_/\___/_/     ".custom_color(*LIGHTBLUE),
+        r"                                                ".custom_color(*LIGHTBLUE),
     ];
 
     let day_time = Local::now();
     let time = process_time(day_time.time().to_string());
     let day = day_time.weekday() as u32;
-    let day_type = Day::from_u32(day);
-    pr.today = day_type.clone();
+    pri.today = Day::from_u32(day);
 
     println!("Welcome to the...");
 
@@ -123,20 +51,23 @@ fn main() {
 
         println!("{}", logo_lines[index]);
 
-        index = index + 1;
+        index += 1;
 
         if index == logo_lines.len() {
             break;
         }
     }
 
-    println!("Today is {day_type:?} and the time is {time}.");
+    println!("Today is {:?} and the time is {time}.", pri.today);
     sleep(Duration::new(0, milli_to_nano(250)));
     println!("Press enter to take a look of your schedule for today:");
     stdin().read_line(&mut input).unwrap();
 
-    println!("{day_type:?}");
-    pr.data.get_day(day_type).unwrap().present_patterns();
+    println!("{:?}", pri.today);
+    pr.data
+        .get_day(pri.today.clone())
+        .unwrap()
+        .present_patterns(true);
 
     println!("Type 'help' if you're unfamiliar with the commands.");
 
@@ -146,8 +77,16 @@ fn main() {
         stdin().read_line(&mut input).unwrap();
 
         match input.trim() {
-            "help" => help(),
-            "exit" => pr.exit(),
+            "help" => {
+                help();
+                input.clear();
+                continue;
+            }
+            "exit" => {
+                pr.exit();
+                input.clear();
+                continue;
+            }
             _ => (),
         };
 

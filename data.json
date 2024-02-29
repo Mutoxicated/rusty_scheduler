@@ -1,0 +1,44 @@
+{
+  "monday": {
+    "day_type": "Monday",
+    "patterns": [
+      {
+        "name": "wefd",
+        "desc": "",
+        "time": "12:02",
+        "special": false
+      }
+    ]
+  },
+  "tuesday": {
+    "day_type": "Tuesday",
+    "patterns": []
+  },
+  "wednesday": {
+    "day_type": "Wednesday",
+    "patterns": []
+  },
+  "thursday": {
+    "day_type": "Thursday",
+    "patterns": [
+      {
+        "name": "32ewrfd",
+        "desc": "",
+        "time": "18:00",
+        "special": false
+      }
+    ]
+  },
+  "friday": {
+    "day_type": "Friday",
+    "patterns": []
+  },
+  "saturday": {
+    "day_type": "Saturday",
+    "patterns": []
+  },
+  "sunday": {
+    "day_type": "Sunday",
+    "patterns": []
+  }
+}

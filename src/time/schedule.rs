@@ -1,11 +1,12 @@
+use crate::arg_parser::ArgError;
 use crate::global::*;
 use crate::program::{ProgramInfo, Receive};
 use crate::time::day::DayType;
 use crate::time::day::{Day, DayType as dt};
 use crate::utils::*;
-use crate::arg_parser::ArgError;
 use colored::{Colorize, CustomColor};
 use serde_derive::{Deserialize, Serialize};
+use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
@@ -54,46 +55,94 @@ impl ScheduleData {
         }
     }
 
-    pub fn get_day_string(&mut self, day_type: String) -> Result<&mut Day, ()> {
-        let generalized_string = &day_type.trim().to_lowercase()[0..3];
-        match generalized_string {
-            "mon" => Ok(&mut self.monday),
-            "tue" => Ok(&mut self.tuesday),
-            "wed" => Ok(&mut self.wednesday),
-            "thu" => Ok(&mut self.thursday),
-            "fri" => Ok(&mut self.friday),
-            "sat" => Ok(&mut self.saturday),
-            "sun" => Ok(&mut self.sunday),
+    pub fn read_day(&self, day_type: dt) -> Result<&Day, ()> {
+        match day_type {
+            dt::Monday => Ok(&self.monday),
+            dt::Tuesday => Ok(&self.tuesday),
+            dt::Wednesday => Ok(&self.wednesday),
+            dt::Thursday => Ok(&self.thursday),
+            dt::Friday => Ok(&self.friday),
+            dt::Saturday => Ok(&self.saturday),
+            dt::Sunday => Ok(&self.sunday),
             _ => Err(()),
         }
     }
 
-    pub fn remove_pattern(&mut self, pri: &mut ProgramInfo) {}
-
-    pub fn add_pattern(&mut self, pri: &mut ProgramInfo) {
-        let args = &pri.args;
-
-        let mut valid_days: Vec<dt> = Vec::new();
-        if let Err(er) = &args.days {
-            println!("{er}");
-            pri.finish();
-            return;
-        }
-        for day in &<Result<Vec<std::string::String>, ArgError> as Clone>::clone(&args.days).unwrap() {
+    fn get_valid_days(valid_days: &mut Vec<dt>, days: &Vec<String>) {
+        for day in days {
             let res = Day::from_string(&day.clone());
             if res == DayType::Na {
                 continue;
             }
             valid_days.push(res);
         }
+    }
 
-        if valid_days.len() == 0 {
-            println!("{}",ArgError::DayFormat);
+    fn remove_pattern(&mut self, pri: &mut ProgramInfo) {
+        if let Err(er) = &pri.args.days {
+            println!("{er}");
+            pri.finish();
+            return;
+        }
+        let mut valid_days: Vec<dt> = Vec::new();
+        ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
+
+        pri.steps += 1;
+
+        if pri.input.is_empty() && pri.steps == 1 {
+            println!("{}", ArgError::Empty);
+            pri.finish();
+            return;
+        }
+        if pri.args.name.is_err() {
+            if pri.steps == 0 {
+                println!("Please provide the name of the {}", "pattern".yellow());
+                return;
+            } else if pri.steps == 1 {
+                pri.input_pattern.name = pri.input.clone();
+                println!("Remove all the patterns with that name?");
+            }
+        } else {
+            pri.input_pattern.name = pri.args.name.as_ref().unwrap().to_owned();
+        }
+        pri.args.all = yes_or_no(pri.input.clone());
+
+        for day in &valid_days {
+            self.get_day(day.clone())
+                .unwrap()
+                .remove_pattern(pri.input_pattern.name.clone(), pri.args.all);
+        }
+
+        println!(
+            "{} '{}' removed from {valid_days:?}!",
+            "Pattern".yellow(),
+            pri.input_pattern.name
+        );
+        pri.finish();
+    }
+
+    fn add_pattern(&mut self, pri: &mut ProgramInfo) {
+        if let Err(er) = &pri.args.days {
+            if pri.args.name.is_err() {
+                println!("{er}");
+                pri.finish();
+                return;
+            }
+        }
+        let mut valid_days: Vec<dt> = Vec::new();
+        if let Ok(dayt) = &pri.args.name {
+            valid_days.push(Day::from_string(dayt));
+        } else {
+            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
+        }
+
+        if valid_days.is_empty() {
+            println!("{}", ArgError::DayFormat);
             pri.finish();
             return;
         }
 
-        pri.steps = pri.steps + 1;
+        pri.steps += 1;
 
         if pri.steps == 3 {
             let formatted_time = format_time(pri.input.as_str());
@@ -110,12 +159,12 @@ impl ScheduleData {
             return;
         }
         if pri.steps == 2 {
-            if let Err(e) = &args.name {
-                println!("{e}");
+            if pri.input.is_empty() {
+                println!("{}", ArgError::Empty);
                 pri.finish();
                 return;
             }
-            pri.input_pattern.name = <Result<String, ArgError> as Clone>::clone(&args.name).unwrap();
+            pri.input_pattern.name = pri.input.clone();
             println!(
                 "What time? {}",
                 "(please use the 24 hour format)".custom_color(*GREY)
@@ -133,30 +182,126 @@ impl ScheduleData {
             return;
         }
 
-        for valid_day in &mut valid_days {
+        for valid_day in &valid_days {
             self.get_day(valid_day.clone())
                 .unwrap()
                 .add_pattern(&pri.input_pattern);
         }
 
-        pri.finish();
         println!(
             "{} '{}' added to {:?}!",
             "Pattern".yellow(),
             pri.input_pattern.name,
             valid_days
         );
+        pri.finish();
+    }
+
+    fn today(&mut self, pri: &mut ProgramInfo) {
+        let day = self.get_day(pri.today.to_owned()).unwrap();
+        println!("{:?}", pri.today);
+        day.present_patterns(true);
+        pri.finish();
+    }
+
+    fn get_schedule(&mut self, pri: &mut ProgramInfo) {
+        let mut valid_daytypes: Vec<dt> = Vec::new();
+        if let Err(arg_err) = &pri.args.days {
+            if *arg_err == ArgError::DayFormat {
+                println!("{arg_err}");
+                pri.finish();
+                return;
+            }
+            valid_daytypes = vec![
+                dt::Monday,
+                dt::Tuesday,
+                dt::Wednesday,
+                dt::Thursday,
+                dt::Friday,
+                dt::Saturday,
+                dt::Sunday,
+            ];
+        } else {
+            ScheduleData::get_valid_days(&mut valid_daytypes, pri.args.days.as_ref().unwrap());
+            if valid_daytypes.is_empty() {
+                println!("{}", ArgError::InvalidDay);
+                pri.finish();
+                return;
+            }
+        }
+        self.present_schedule(valid_daytypes);
+        pri.finish();
+    }
+
+    fn present_schedule(&mut self, days: Vec<dt>) {
+        let mut day_indices: Vec<usize> = Vec::new();
+        let mut actual_days: Vec<&Day> = Vec::new();
+        for day in &days {
+            actual_days.push(self.read_day(day.clone()).unwrap());
+        }
+
+        let mut line1: String = String::new();
+        for day in &actual_days {
+            day_indices.push(line1.len());
+            line1.push_str(format!("{:?}", day.day_type).as_str());
+            line1.push_str(&DAY_SPACE);
+        }
+        println!("{line1}");
+
+        let width = line1.len();
+        let mut mold_line: String = String::new();
+        for _ in 0..width {
+            mold_line.push(' ');
+        }
+
+        let mut curr_pat: usize = 0;
+        let mut curr_pat_inner: usize = 0;
+        let mut current_pattern_line: Option<String>;
+        let mut succesful_pattern_lines: Vec<bool> = Vec::new();
+
+        loop {
+            let mut curr_line = mold_line.clone();
+
+            if curr_pat_inner > 1 {
+                curr_pat += 1;
+                curr_pat_inner = 0
+            }
+
+            for i in 0..actual_days.len() {
+                current_pattern_line = actual_days[i].get_pattern_string(curr_pat, curr_pat_inner);
+                if let Some(line) = current_pattern_line {
+                    succesful_pattern_lines.push(true);
+                    curr_line.replace_range(
+                        day_indices[i]
+                            ..day_indices[i] + line.len(),
+                            line.as_str(),
+                    );
+                }
+            }
+
+            if succesful_pattern_lines.is_empty() {
+                break;
+            }
+
+            curr_pat_inner += 1;
+            println!("{curr_line}");
+            succesful_pattern_lines.clear();
+        }
     }
 }
 
 impl Receive for ScheduleData {
-    fn receive(&mut self, mut pri: &mut ProgramInfo) {
-        println!("Debug: Command Name->{}", pri.command_name);
+    fn receive(&mut self, pri: &mut ProgramInfo) {
+        //println!("Debug: Command Name->{}", pri.command_name);
+        if pri.command_finished {
+            println!("{}", "|".custom_color(*GREY));
+        }
 
         match pri.command_name.as_str() {
-            "add_pattern" => {
-                self.add_pattern(&mut pri);
-            }
+            "add_pattern" => self.add_pattern(pri),
+            "remove_pattern" => self.remove_pattern(pri),
+            "today" => self.today(pri),
+            "get_schedule" => self.get_schedule(pri),
             _ => (),
         }
     }

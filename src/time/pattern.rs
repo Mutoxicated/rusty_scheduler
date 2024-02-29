@@ -1,7 +1,8 @@
+use crate::utils::{get_hour, get_minutes};
+use colored::{ColoredString, Colorize};
 use serde_derive::{Deserialize, Serialize};
-use crate::utils::{get_hour,get_minutes};
 
-#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug,)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Pattern {
     pub name: String,
     pub desc: String,
@@ -13,42 +14,27 @@ use std::cmp::Ordering;
 
 impl PartialOrd for Pattern {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let hour1 = get_hour(&self.time);
-        let hour2 = get_hour(&other.time);
-        if hour1 > hour2 {
-            return Some(Ordering::Greater);
-        }else if hour1 < hour2 {
-            return Some(Ordering::Less);
-        }
-        let minutes1 = get_minutes(&self.time);
-        let minutes2 = get_minutes(&other.time);
-        if minutes1 > minutes2 {
-            return Some(Ordering::Greater);
-        }else if minutes1 < minutes2 {
-            return Some(Ordering::Less);
-        }else{
-            return Some(Ordering::Equal);
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Pattern {
-    fn cmp(&self, other:&Self) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         let hour1 = get_hour(&self.time);
         let hour2 = get_hour(&other.time);
         if hour1 > hour2 {
             return Ordering::Greater;
-        }else if hour1 < hour2 {
+        } else if hour1 < hour2 {
             return Ordering::Less;
         }
         let minutes1 = get_minutes(&self.time);
         let minutes2 = get_minutes(&other.time);
         if minutes1 > minutes2 {
-            return Ordering::Greater;
-        }else if minutes1 < minutes2 {
-            return Ordering::Less;
-        }else{
-            return Ordering::Equal;
+            Ordering::Greater
+        } else if minutes1 < minutes2 {
+            Ordering::Less
+        } else {
+           Ordering::Equal
         }
     }
 }
@@ -73,19 +59,37 @@ impl Pattern {
     }
 
     pub fn is_ready(&self, current_time: String) -> bool {
-        if self.time == current_time {
-            true
+        self.time == current_time
+    }
+
+    pub fn present(&self, in_detail: bool) {
+        println!("| {}", self.time.blue());
+        let colored_name: ColoredString = if self.special.unwrap() {
+            self.name.green()
         } else {
-            false
+            self.name.yellow()
+        };
+        if self.desc.is_empty() || !in_detail {
+            println!("|_ {}", colored_name);
+        } else {
+            println!("|_ {} - {}", colored_name, self.desc);
         }
     }
 
-    pub fn present(&self) {
-        println!("|");
-        if self.desc == "" {
-            println!("|_ {} - {}", self.time, self.name);
+    pub fn get_stringified(&self, idx: usize, in_detail: bool) -> String {
+        if idx == 0 {
+            return format!("| {}", self.time);
+        }
+        // let colored_name:ColoredString;
+        // if self.special.unwrap() {
+        //     colored_name = self.name.green();
+        // }else{
+        //     colored_name = self.name.yellow();
+        // }
+        if self.desc.is_empty() || !in_detail {
+            format!("|_ {}", self.name)
         } else {
-            println!("|_ {} - {} - {}", self.time, self.name, self.desc);
+            format!("|_ {} - {}", self.name, self.desc)
         }
     }
 }

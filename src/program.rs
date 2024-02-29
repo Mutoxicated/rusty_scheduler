@@ -1,11 +1,15 @@
 use crate::arg_parser::Args;
+use crate::global::*;
 use crate::pst_data::Data;
 use crate::time::day::DayType;
 use crate::time::Pattern;
 use crate::time::ScheduleData;
+use crate::utils::format_command_name;
+
+use colored::Colorize;
 
 pub trait Receive {
-    fn receive<'a>(&mut self, pr: &mut ProgramInfo);
+    fn receive(&mut self, pr: &mut ProgramInfo);
 }
 
 pub struct ProgramInfo {
@@ -15,6 +19,7 @@ pub struct ProgramInfo {
     pub command_finished: bool,
     pub input: String,
     pub steps: i32,
+    pub today: DayType,
 }
 
 impl ProgramInfo {
@@ -26,31 +31,31 @@ impl ProgramInfo {
             command_finished: true,
             input: String::new(),
             steps: -1,
+            today: DayType::Na,
         }
     }
 
     pub fn finish(&mut self) {
         self.steps = -1;
         self.command_finished = true;
+        self.input_pattern = Pattern::new_empty();
     }
 }
 
 #[derive(Clone)]
 pub struct Program {
     pub data: ScheduleData,
-    pub today: DayType,
 }
 
 impl Program {
     pub fn new() -> Self {
         Self {
             data: ScheduleData::new(),
-            today: DayType::Na,
         }
     }
 
     pub fn exit(&self) {
-        println!("|");
+        println!("{}", "|".custom_color(*GREY));
         println!("Exiting...");
         Data::write(&self);
         std::process::exit(0);
@@ -75,6 +80,7 @@ impl Program {
             parameters = input[i + 1..input.len()].to_string();
             parameterless_command.replace_range(i..input.len(), "");
         }
+        format_command_name(&mut parameterless_command);
         pri.args = Args::get_args(&parameters);
         pri.command_name = parameterless_command.clone();
 

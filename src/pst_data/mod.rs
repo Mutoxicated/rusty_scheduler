@@ -1,19 +1,23 @@
 use crate::program::Program;
 use crate::time::ScheduleData;
 use file_into_string::*;
-use std::fs;
 use std::fs::File;
 use std::path::Path;
+use std::{env, fs};
 
 use lazy_static::lazy_static;
 lazy_static! {
-    static ref DATA_PATH: String = "./src/data.json".to_string();
+    static ref DATA_PATH: String = "./data.json".to_string();
 }
 
 pub struct Data {}
 
 impl Data {
     pub fn read(pr: &mut Program) {
+        let exe = env::current_exe().unwrap();
+        let dir = exe.parent().expect("Exe must be in some directory");
+        println!("Current dir: {:?}", dir);
+
         println!("Reading...");
         let path = Path::new(DATA_PATH.as_str());
         let file = File::open(path);

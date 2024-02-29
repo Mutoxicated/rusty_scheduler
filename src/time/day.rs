@@ -67,8 +67,8 @@ impl Day {
             _ => DayType::Na,
         }
     }
-    
-    fn chronologicalize(&mut self){
+
+    fn chronologicalize(&mut self) {
         self.patterns.sort();
     }
 
@@ -106,9 +106,16 @@ impl Day {
         return None;
     }
 
-    pub fn present_patterns(&self) {
+    pub fn present_patterns(&self, in_detail: bool) {
         for pattern in &self.patterns {
-            pattern.present();
+            pattern.present(in_detail);
         }
+    }
+
+    pub fn get_pattern_string(&self, idx: usize, inner_idx: usize) -> Option<String> {
+        if idx >= self.patterns.len() {
+            return None;
+        }
+        Some(self.patterns[idx].get_stringified(inner_idx, false))
     }
 }
