@@ -90,7 +90,7 @@ fn main() {
             _ => (),
         };
 
-        pr.receive(&mut pri, &input.trim().to_string());
+        pr.receive(&mut pri, input.trim());
 
         input.clear();
     }

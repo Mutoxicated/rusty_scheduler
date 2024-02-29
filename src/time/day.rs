@@ -31,7 +31,7 @@ pub struct Day {
 impl Day {
     pub fn new(day_type: DayType) -> Self {
         Self {
-            day_type: day_type,
+            day_type,
             patterns: Vec::new(),
         }
     }
@@ -49,7 +49,7 @@ impl Day {
         }
     }
 
-    pub fn from_string(string: &String) -> DayType {
+    pub fn from_string(string: &str) -> DayType {
         let mut max = string.len();
         if max > 3 {
             max = 3
@@ -91,19 +91,17 @@ impl Day {
             if self.patterns[i].name == name {
                 self.patterns.remove(i);
                 if !all {
-                    return ();
+                    return;
                 }
             }
         }
     }
 
     pub fn check_patterns(&self, current_time: String) -> Option<&Pattern> {
-        for event in &self.patterns {
-            if event.is_ready(current_time.clone()) {
-                return Some(event);
-            }
-        }
-        return None;
+        self.patterns
+            .iter()
+            .find(|&event| event.is_ready(current_time.clone()));
+        None
     }
 
     pub fn present_patterns(&self, in_detail: bool) {

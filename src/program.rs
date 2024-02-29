@@ -57,12 +57,12 @@ impl Program {
     pub fn exit(&self) {
         println!("{}", "|".custom_color(*GREY));
         println!("Exiting...");
-        Data::write(&self);
+        Data::write(self);
         std::process::exit(0);
     }
 
-    pub fn receive(&mut self, pri: &mut ProgramInfo, input: &String) {
-        pri.input = input.clone();
+    pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
+        pri.input = input.to_string();
         if pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel" {
             println!("Stopped Command.");
             pri.finish();
@@ -75,7 +75,7 @@ impl Program {
         }
         let mut parameterless_command: String = input.to_lowercase().clone();
         let mut parameters = String::new();
-        let index_at_space = parameterless_command.find(" ");
+        let index_at_space = parameterless_command.find(' ');
         if let Some(i) = index_at_space {
             parameters = input[i + 1..input.len()].to_string();
             parameterless_command.replace_range(i..input.len(), "");

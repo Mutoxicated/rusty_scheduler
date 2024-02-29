@@ -82,9 +82,7 @@ pub fn get_minutes(time: &str) -> i32 {
 
 fn get_hour_str(time: &str) -> Option<String> {
     let idx = time.find(':');
-    if idx.is_none() {
-        return None;
-    }
+    idx?;
     if idx.unwrap() + 1 == time.len() {
         return Some("".to_string());
     }
@@ -94,9 +92,7 @@ fn get_hour_str(time: &str) -> Option<String> {
 
 fn get_minutes_str(time: &str) -> Option<String> {
     let idx = time.find(':');
-    if idx.is_none() {
-        return None;
-    }
+    idx?;
     if idx.unwrap() + 1 == time.len() {
         return Some("".to_string());
     }
@@ -147,7 +143,7 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
     }
 
     if minutes_res.unwrap().len() == 1 && time.len() > 2 {
-        formatted_time.insert_str(3, "0");
+        formatted_time.insert(3, '0');
         return Ok(formatted_time);
     }
 

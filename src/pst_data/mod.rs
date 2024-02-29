@@ -25,8 +25,8 @@ impl Data {
             Ok(_) => {}
             Err(_) => {
                 File::create(path).expect("Somehow failed to create the json file lol");
-                Data::write(&pr);
-                return ();
+                Data::write(pr);
+                return;
             }
         }
         let data = file_into_string(file.unwrap()).unwrap();

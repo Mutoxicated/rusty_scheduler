@@ -6,7 +6,6 @@ use crate::time::day::{Day, DayType as dt};
 use crate::utils::*;
 use colored::{Colorize, CustomColor};
 use serde_derive::{Deserialize, Serialize};
-use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {

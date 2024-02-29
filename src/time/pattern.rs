@@ -20,22 +20,11 @@ impl PartialOrd for Pattern {
 
 impl Ord for Pattern {
     fn cmp(&self, other: &Self) -> Ordering {
-        let hour1 = get_hour(&self.time);
-        let hour2 = get_hour(&other.time);
-        if hour1 > hour2 {
-            return Ordering::Greater;
-        } else if hour1 < hour2 {
-            return Ordering::Less;
+        let comparison = get_hour(&self.time).cmp(&get_hour(&other.time));
+        if let Ordering::Equal = comparison {
+            return get_minutes(&self.time).cmp(&get_minutes(&other.time));
         }
-        let minutes1 = get_minutes(&self.time);
-        let minutes2 = get_minutes(&other.time);
-        if minutes1 > minutes2 {
-            Ordering::Greater
-        } else if minutes1 < minutes2 {
-            Ordering::Less
-        } else {
-           Ordering::Equal
-        }
+        comparison
     }
 }
 
