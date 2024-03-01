@@ -10,9 +10,9 @@ use colored::{ColoredString, Colorize};
 use global::*;
 use program::{Program, ProgramInfo};
 use pst_data::Data;
-use std::{io::stdin, thread::sleep, time::Duration};
-use time::day::Day;
-use utils::{help, milli_to_nano, process_time};
+use std::{io::stdin, thread::{self, sleep}, time::Duration,sync::{Mutex,Arc}};
+use time::{day::Day,Time};
+use utils::*;
 
 fn main() {
     let mut pr = Program::new();
@@ -38,7 +38,7 @@ fn main() {
     ];
 
     let day_time = Local::now();
-    let time = process_time(day_time.time().to_string());
+    let (time,_) = process_time(&day_time.time().to_string());
     let day = day_time.weekday() as u32;
     pri.today = Day::from_u32(day);
 
@@ -69,29 +69,54 @@ fn main() {
         .unwrap()
         .present_patterns(true);
 
-    println!("Type 'help' if you're unfamiliar with the commands.");
+    println!("{}help{}","Type '".green(),"' if you're unfamiliar with the commands.".green());
 
-    let mut input: String = String::new();
+    let program:Arc<Mutex<Program>> = Arc::new(Mutex::new(pr));
+    let program_info:Arc<Mutex<ProgramInfo>> = Arc::new(Mutex::new(pri));
 
-    loop {
-        stdin().read_line(&mut input).unwrap();
+    let cloned_program = Arc::clone(&program);
+    let cloned_program_info = Arc::clone(&program_info);
+    thread::spawn(move || {
+        let day_time = Local::now();
+        let (time,secs) = process_time(&day_time.time().to_string());
+        let (hours,mins,seconds) = 
+        (get_hour(time.as_str()),
+        get_minutes(time.as_str()),
+        secs.parse().unwrap());
+        let mut timee:Time = Time::new(
+            hours,
+            mins,
+            seconds);
+        loop {
+            sleep(Duration::new(60,0));
+            timee.tick_min();
+            cloned_program.lock().unwrap().check_patterns(timee.hours,timee.minutes,cloned_program_info.lock().unwrap().today.clone());
+        }
+    });
 
-        match input.trim() {
-            "help" => {
-                help();
-                input.clear();
-                continue;
-            }
-            "exit" => {
-                pr.exit();
-                input.clear();
-                continue;
-            }
-            _ => (),
-        };
+    thread::spawn(move || {
+        let mut input: String = String::new();
+        loop {
+            stdin().read_line(&mut input).unwrap();
+    
+            match input.trim() {
+                "help" => {
+                    help();
+                    input.clear();
+                    continue;
+                }
+                "exit" => {
+                    program.lock().unwrap().exit();
+                    input.clear();
+                    continue;
+                }
+                _ => (),
+            };
+    
+            program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
+    
+            input.clear();
+        }
+    }).join().unwrap();
 
-        pr.receive(&mut pri, input.trim());
-
-        input.clear();
-    }
 }

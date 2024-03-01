@@ -118,7 +118,10 @@ impl Args {
                 }
             }
 
-            str.to_string().replace_range(index.unwrap()..index2.unwrap() + 1, "");
+            let mut temp_str = str.to_string();
+            temp_str.replace_range(index.unwrap()..index2.unwrap() + 1, "");
+
+            str = temp_str.as_str();
 
             str = str.trim();
 

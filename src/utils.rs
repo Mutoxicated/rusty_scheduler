@@ -33,8 +33,8 @@ pub fn help() {
     );
 }
 
-pub fn process_time(time: String) -> String {
-    let mut new_time: String = time;
+pub fn process_time(time: &str) -> (String,String) {
+    let mut new_time: String = time.to_string();
 
     let length: usize = new_time.chars().count();
 
@@ -43,14 +43,14 @@ pub fn process_time(time: String) -> String {
     for _ in 0..length {
         index -= 1;
         //println!("{}",new_time.chars().nth(index).unwrap());
-        if new_time.chars().nth(index).unwrap() == ':' {
-            new_time.remove(index);
-            return new_time;
+        if new_time.chars().nth(index-2).unwrap() == ':' {
+            //new_time.remove(index);
+            return (new_time[0..index-2].to_owned(),new_time[index-1..index+1].to_owned());
         }
         new_time.remove(index);
     }
 
-    new_time
+    (new_time,"0".to_string())
 }
 
 pub fn milli_to_nano(num: u32) -> u32 {
@@ -106,7 +106,14 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
     let hour = get_hour_str(time);
     let minutes: Option<String> = get_minutes_str(time);
 
-    if time.len() == 2 {
+    if formatted_time.len() == 1 {
+        let mut full_str:String = "0".to_string();
+        full_str.push_str(formatted_time.as_str());
+        formatted_time = full_str;
+        //println!("{formatted_time}");
+    }
+
+    if formatted_time.len() == 2 {
         let res: Result<i32, _> = time.parse();
         if let Ok(mut num) = res {
             if num > 23 {
@@ -149,7 +156,7 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
 
     let minutes: i32 = formatted_time[3..5].parse().unwrap();
 
-    println!("{minutes}");
+    //println!("{minutes}");
 
     if minutes > 59 {
         formatted_time.replace_range(3..5, "59");
@@ -162,7 +169,7 @@ pub fn format_command_name(command: &mut String) {
     if command == "today" {
         return;
     }
-    println!("{command}");
+    //println!("{command}");
     if !command.contains('_') {
         if command == "get" {
             command.push_str("_schedule");

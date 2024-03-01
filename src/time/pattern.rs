@@ -1,13 +1,16 @@
 use crate::utils::{get_hour, get_minutes};
 use colored::{ColoredString, Colorize};
 use serde_derive::{Deserialize, Serialize};
+use notify_rust::{Timeout,Notification};
 
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Pattern {
     pub name: String,
     pub desc: String,
-    pub time: String,
-    pub special: Option<bool>,
+    time: String,
+    hours:i32,
+    mins:i32,
+    pub special: bool,
 }
 
 use std::cmp::Ordering;
@@ -29,31 +32,42 @@ impl Ord for Pattern {
 }
 
 impl Pattern {
-    pub fn new(name: String, desc: String, time: String, special: Option<bool>) -> Self {
-        Self {
-            name,
-            desc,
-            time,
-            special,
-        }
-    }
-
     pub fn new_empty() -> Self {
         Self {
             name: String::new(),
             desc: String::new(),
             time: String::new(),
-            special: Some(false),
+            hours:0,
+            mins:0,
+            special: false,
         }
     }
 
-    pub fn is_ready(&self, current_time: String) -> bool {
-        self.time == current_time
+    pub fn change_time(&mut self,time:&str){
+        self.time = time.to_owned();
+
+        self.hours = get_hour(time);
+        self.mins = get_minutes(time);
+    }
+
+    pub fn notify(&self){
+        //println!("{}","Notification!".green());
+        Notification::new()
+            .summary(self.name.as_str())
+            .body(self.desc.as_str())
+            .timeout(Timeout::Milliseconds(6000))
+            .finalize()
+            .show()
+            .unwrap();
+    }
+
+    pub fn is_ready(&self, hours:i32, mins:i32) -> bool {
+        self.hours == hours && self.mins == mins
     }
 
     pub fn present(&self, in_detail: bool) {
         println!("| {}", self.time.blue());
-        let colored_name: ColoredString = if self.special.unwrap() {
+        let colored_name: ColoredString = if self.special {
             self.name.green()
         } else {
             self.name.yellow()

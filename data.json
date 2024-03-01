@@ -1,14 +1,7 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": [
-      {
-        "name": "wefd",
-        "desc": "",
-        "time": "12:02",
-        "special": false
-      }
-    ]
+    "patterns": []
   },
   "tuesday": {
     "day_type": "Tuesday",
@@ -20,18 +13,20 @@
   },
   "thursday": {
     "day_type": "Thursday",
-    "patterns": [
-      {
-        "name": "32ewrfd",
-        "desc": "",
-        "time": "18:00",
-        "special": false
-      }
-    ]
+    "patterns": []
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "ewretrgfhgfvc",
+        "desc": "waefsrgdethytjmh",
+        "time": "20:12",
+        "hours": 20,
+        "mins": 12,
+        "special": false
+      }
+    ]
   },
   "saturday": {
     "day_type": "Saturday",

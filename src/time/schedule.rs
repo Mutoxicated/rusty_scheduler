@@ -131,6 +131,11 @@ impl ScheduleData {
         let mut valid_days: Vec<dt> = Vec::new();
         if let Ok(dayt) = &pri.args.name {
             valid_days.push(Day::from_string(dayt));
+            if valid_days[0] == DayType::Na {
+                println!("{}",ArgError::InvalidDay);
+                pri.finish();
+                return;
+            }
         } else {
             ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
         }
@@ -142,7 +147,9 @@ impl ScheduleData {
         }
 
         pri.steps += 1;
-
+        if pri.steps == 4 {
+            pri.input_pattern.desc = pri.input.clone();
+        }
         if pri.steps == 3 {
             let formatted_time = format_time(pri.input.as_str());
             if let Err(x) = formatted_time {
@@ -150,7 +157,7 @@ impl ScheduleData {
                 pri.finish();
                 return;
             }
-            pri.input_pattern.time = formatted_time.unwrap();
+            pri.input_pattern.change_time(formatted_time.unwrap().as_str());
             println!(
                 "Please provide a description. {}",
                 "(you can leave it empty)".custom_color(*GREY)
@@ -171,7 +178,7 @@ impl ScheduleData {
             return;
         }
         if pri.steps == 1 {
-            pri.input_pattern.special = Some(yes_or_no(pri.input.clone()));
+            pri.input_pattern.special = yes_or_no(pri.input.clone());
             println!("What is the name of the pattern?");
             return;
         }
@@ -206,20 +213,29 @@ impl ScheduleData {
     fn get_schedule(&mut self, pri: &mut ProgramInfo) {
         let mut valid_daytypes: Vec<dt> = Vec::new();
         if let Err(arg_err) = &pri.args.days {
-            if *arg_err == ArgError::DayFormat {
-                println!("{arg_err}");
-                pri.finish();
-                return;
+            if let Ok(name) = &pri.args.name {
+                valid_daytypes.push(Day::from_string(name));
+                if valid_daytypes[0] == DayType::Na {
+                    println!("{}",ArgError::InvalidDay);
+                    pri.finish();
+                    return;
+                }
+            }else{
+                if *arg_err == ArgError::DayFormat {
+                    println!("{arg_err}");
+                    pri.finish();
+                    return;
+                }
+                valid_daytypes = vec![
+                    dt::Monday,
+                    dt::Tuesday,
+                    dt::Wednesday,
+                    dt::Thursday,
+                    dt::Friday,
+                    dt::Saturday,
+                    dt::Sunday,
+                ];
             }
-            valid_daytypes = vec![
-                dt::Monday,
-                dt::Tuesday,
-                dt::Wednesday,
-                dt::Thursday,
-                dt::Friday,
-                dt::Saturday,
-                dt::Sunday,
-            ];
         } else {
             ScheduleData::get_valid_days(&mut valid_daytypes, pri.args.days.as_ref().unwrap());
             if valid_daytypes.is_empty() {

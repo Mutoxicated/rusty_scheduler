@@ -72,15 +72,6 @@ impl Day {
         self.patterns.sort();
     }
 
-    fn pattern_name_exists(&mut self, name: &String) -> bool {
-        for pattern in &self.patterns {
-            if pattern.name == *name {
-                return true;
-            }
-        }
-        false
-    }
-
     pub fn add_pattern(&mut self, pattern: &Pattern) {
         self.patterns.push(pattern.clone());
         self.chronologicalize();
@@ -97,11 +88,15 @@ impl Day {
         }
     }
 
-    pub fn check_patterns(&self, current_time: String) -> Option<&Pattern> {
-        self.patterns
-            .iter()
-            .find(|&event| event.is_ready(current_time.clone()));
-        None
+    pub fn check_patterns(&mut self, hours:i32,mins:i32) {
+        for i in 0..self.patterns.len() {
+            if self.patterns[i].is_ready(hours,mins){
+                self.patterns[i].notify();
+                if self.patterns[i].special {
+                    self.patterns.remove(i);
+                }
+            }
+        }
     }
 
     pub fn present_patterns(&self, in_detail: bool) {

@@ -86,4 +86,9 @@ impl Program {
 
         self.data.receive(pri);
     }
+
+    pub fn check_patterns(&mut self,hours:i32,mins:i32,dt:DayType){
+        let day = self.data.get_day(dt).unwrap();
+        day.check_patterns(hours, mins)
+    }
 }
