@@ -23,7 +23,7 @@ pub fn help() {
     println!("-find_pattern <optional:name> {}\n","(not yet added)".custom_color(*GREY));
 
     println!("Example: add_pattern [Monday,Tuesday]");
-    println!("Example: copy_pattern [Sunday] Basketball\n");
+    println!("Example: copy_pattern [sun] Basketball\n");
 
     println!(
         "{}",

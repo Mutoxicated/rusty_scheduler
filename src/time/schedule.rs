@@ -78,19 +78,33 @@ impl ScheduleData {
     }
 
     fn copy_pattern(&mut self, pri: &mut ProgramInfo){
+        let dayt:DayType;
         if let Err(er) = &pri.args.days {
-            println!("{er}");
-            pri.finish();
-            return;
+            if pri.args.name.is_err() {
+                println!("{er}");
+                pri.finish();
+                return;
+            }else {
+                dayt = Day::from_string(pri.args.name.as_ref().unwrap());
+            }    
+        }else {
+            dayt = Day::from_string(pri.args.days.as_ref().unwrap()[0].as_str());
         }
 
-        if let Err(er) = &pri.args.name {
-            println!("{er}");
-            pri.finish();
-            return;
-        }
+        pri.steps += 1;
 
-        let dayt = Day::from_string(pri.args.days.as_ref().unwrap()[0].as_str());
+        let mut name:&str = "";
+
+        if pri.args.days.is_err() {
+            if pri.steps == 0{
+                println!("Please provide the name of the pattern.");
+                return;
+            }else if pri.steps == 1 {
+                name = pri.input.as_str();
+            }
+        }else {
+            name = pri.args.name.as_ref().unwrap();
+        }
 
         if dayt == DayType::Na {
             println!("{}",ArgError::InvalidDay);
@@ -99,8 +113,6 @@ impl ScheduleData {
         }
 
         let day = self.get_day(dayt.clone()).unwrap();
-
-        let name = pri.args.name.as_ref().unwrap().as_str();
 
         if !day.pattern_exists(name){
             println!("{}",ArgError::InvalidPatternName);
@@ -132,7 +144,7 @@ impl ScheduleData {
             ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
         }
 
-        if valid_days[0] == DayType::Na || valid_days.is_empty() {
+        if valid_days.is_empty() || valid_days[0] == DayType::Na {
             println!("{}",ArgError::InvalidDay);
             pri.finish();
             return;
@@ -171,6 +183,12 @@ impl ScheduleData {
         }
 
         pri.steps += 1;
+
+        if valid_days.is_empty() {
+            println!("{}",ArgError::InvalidDay);
+            pri.finish();
+            return;
+        }
 
         if pri.input.is_empty() && pri.steps == 1 {
             println!("{}", ArgError::Empty);
@@ -412,7 +430,7 @@ impl Receive for ScheduleData {
             "get_schedule" => self.get_schedule(pri),
             "copy_pattern" => self.copy_pattern(pri),
             "paste_pattern" => self.paste_pattern(pri),
-            _ => (),
+            _ => {pri.command_finished = true;},
         }
     }
 }

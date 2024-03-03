@@ -3,36 +3,12 @@
     "day_type": "Monday",
     "patterns": [
       {
-        "name": "weqrrf",
-        "desc": "pwoewuibfvuiWIOEBDSNF",
-        "time": "02:49",
-        "hours": 2,
-        "mins": 49,
-        "special": false
-      },
-      {
         "name": "to",
         "desc": "wrdgfhdgnhmghrer",
         "time": "12:00",
         "hours": 12,
         "mins": 0,
         "special": false
-      },
-      {
-        "name": "to",
-        "desc": "wrdgfhdgnhmghrer",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      },
-      {
-        "name": "popopo",
-        "desc": "gay",
-        "time": "19:00",
-        "hours": 19,
-        "mins": 0,
-        "special": true
       }
     ]
   },

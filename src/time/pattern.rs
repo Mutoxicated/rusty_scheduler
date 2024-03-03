@@ -2,6 +2,7 @@ use crate::utils::{get_hour, get_minutes};
 use colored::{ColoredString, Colorize};
 use serde_derive::{Deserialize, Serialize};
 use winrt_notification::{Toast,Duration};
+use crate::pst_data::AUMID;
 
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Pattern {
@@ -52,7 +53,7 @@ impl Pattern {
 
     pub fn notify(&self){
         //println!("{}","Notification!".green());
-        Toast::new(Toast::POWERSHELL_APP_ID)
+        Toast::new(AUMID.read().unwrap().as_str())
             .title(&self.name)
             .text1(&self.desc)
             .duration(Duration::Short)

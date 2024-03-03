@@ -65,6 +65,8 @@ impl Program {
 
     pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
         pri.input = input.to_string();
+        //println!("Debug: command_finished->{}",pri.command_finished);
+
         if !pri.command_finished && (pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel") {
             println!("Stopped Command.");
             pri.finish();
@@ -85,6 +87,7 @@ impl Program {
         format_command_name(&mut parameterless_command);
         pri.args = Args::get_args(&parameters);
         pri.command_name = parameterless_command.clone();
+        pri.command_finished = false;
 
         self.data.receive(pri);
     }
