@@ -1,8 +1,7 @@
 use crate::arg_parser::ArgError;
 use crate::global::*;
 use crate::program::{ProgramInfo, Receive};
-use crate::time::day::DayType;
-use crate::time::day::{Day, DayType as dt};
+use crate::time::day::{Day, DayType};
 use crate::utils::*;
 use colored::{Colorize, CustomColor};
 use serde_derive::{Deserialize, Serialize};
@@ -21,13 +20,13 @@ pub struct ScheduleData {
 impl ScheduleData {
     pub fn new() -> Self {
         Self {
-            monday: Day::new(dt::Monday),
-            tuesday: Day::new(dt::Tuesday),
-            wednesday: Day::new(dt::Wednesday),
-            thursday: Day::new(dt::Thursday),
-            friday: Day::new(dt::Friday),
-            saturday: Day::new(dt::Saturday),
-            sunday: Day::new(dt::Sunday),
+            monday: Day::new(DayType::Monday),
+            tuesday: Day::new(DayType::Tuesday),
+            wednesday: Day::new(DayType::Wednesday),
+            thursday: Day::new(DayType::Thursday),
+            friday: Day::new(DayType::Friday),
+            saturday: Day::new(DayType::Saturday),
+            sunday: Day::new(DayType::Sunday),
         }
     }
 
@@ -41,33 +40,33 @@ impl ScheduleData {
         self.sunday = other.sunday.clone();
     }
 
-    pub fn get_day(&mut self, day_type: dt) -> Result<&mut Day, ()> {
+    pub fn get_day(&mut self, day_type: DayType) -> Result<&mut Day, ()> {
         match day_type {
-            dt::Monday => Ok(&mut self.monday),
-            dt::Tuesday => Ok(&mut self.tuesday),
-            dt::Wednesday => Ok(&mut self.wednesday),
-            dt::Thursday => Ok(&mut self.thursday),
-            dt::Friday => Ok(&mut self.friday),
-            dt::Saturday => Ok(&mut self.saturday),
-            dt::Sunday => Ok(&mut self.sunday),
+            DayType::Monday => Ok(&mut self.monday),
+            DayType::Tuesday => Ok(&mut self.tuesday),
+            DayType::Wednesday => Ok(&mut self.wednesday),
+            DayType::Thursday => Ok(&mut self.thursday),
+            DayType::Friday => Ok(&mut self.friday),
+            DayType::Saturday => Ok(&mut self.saturday),
+            DayType::Sunday => Ok(&mut self.sunday),
             _ => Err(()),
         }
     }
 
-    pub fn read_day(&self, day_type: dt) -> Result<&Day, ()> {
+    pub fn read_day(&self, day_type: DayType) -> Result<&Day, ()> {
         match day_type {
-            dt::Monday => Ok(&self.monday),
-            dt::Tuesday => Ok(&self.tuesday),
-            dt::Wednesday => Ok(&self.wednesday),
-            dt::Thursday => Ok(&self.thursday),
-            dt::Friday => Ok(&self.friday),
-            dt::Saturday => Ok(&self.saturday),
-            dt::Sunday => Ok(&self.sunday),
+            DayType::Monday => Ok(&self.monday),
+            DayType::Tuesday => Ok(&self.tuesday),
+            DayType::Wednesday => Ok(&self.wednesday),
+            DayType::Thursday => Ok(&self.thursday),
+            DayType::Friday => Ok(&self.friday),
+            DayType::Saturday => Ok(&self.saturday),
+            DayType::Sunday => Ok(&self.sunday),
             _ => Err(()),
         }
     }
 
-    fn get_valid_days(valid_days: &mut Vec<dt>, days: &Vec<String>) {
+    fn get_valid_days(valid_days: &mut Vec<DayType>, days: &Vec<String>) {
         for day in days {
             let res = Day::from_string(&day.clone());
             if res == DayType::Na {
@@ -129,7 +128,7 @@ impl ScheduleData {
             pri.finish();
             return;
         }
-        let mut valid_days: Vec<dt> = Vec::new();
+        let mut valid_days: Vec<DayType> = Vec::new();
 
         if let Ok(name) = &pri.args.name {
             valid_days = vec![
@@ -161,7 +160,7 @@ impl ScheduleData {
     }
 
     fn remove_pattern(&mut self, pri: &mut ProgramInfo) {
-        let mut valid_days: Vec<dt> = Vec::new();
+        let mut valid_days: Vec<DayType> = Vec::new();
         if let Err(er) = &pri.args.days {
             if !pri.args.all {
                 println!("{er}");
@@ -169,13 +168,13 @@ impl ScheduleData {
                 return;
             }else {
                 valid_days = vec![
-                    dt::Monday,
-                    dt::Tuesday,
-                    dt::Wednesday,
-                    dt::Thursday,
-                    dt::Friday,
-                    dt::Saturday,
-                    dt::Sunday,
+                    DayType::Monday,
+                    DayType::Tuesday,
+                    DayType::Wednesday,
+                    DayType::Thursday,
+                    DayType::Friday,
+                    DayType::Saturday,
+                    DayType::Sunday,
                 ];
             }
         }else {
@@ -239,7 +238,7 @@ impl ScheduleData {
                 return;
             }
         }
-        let mut valid_days: Vec<dt> = Vec::new();
+        let mut valid_days: Vec<DayType> = Vec::new();
         if let Ok(dayt) = &pri.args.name {
             valid_days.push(Day::from_string(dayt));
             if valid_days[0] == DayType::Na {
@@ -322,7 +321,7 @@ impl ScheduleData {
     }
 
     fn get_schedule(&mut self, pri: &mut ProgramInfo) {
-        let mut valid_daytypes: Vec<dt> = Vec::new();
+        let mut valid_daytypes: Vec<DayType> = Vec::new();
         if let Err(arg_err) = &pri.args.days {
             if let Ok(name) = &pri.args.name {
                 valid_daytypes.push(Day::from_string(name));
@@ -338,13 +337,13 @@ impl ScheduleData {
                     return;
                 }
                 valid_daytypes = vec![
-                    dt::Monday,
-                    dt::Tuesday,
-                    dt::Wednesday,
-                    dt::Thursday,
-                    dt::Friday,
-                    dt::Saturday,
-                    dt::Sunday,
+                    DayType::Monday,
+                    DayType::Tuesday,
+                    DayType::Wednesday,
+                    DayType::Thursday,
+                    DayType::Friday,
+                    DayType::Saturday,
+                    DayType::Sunday,
                 ];
             }
         } else {
@@ -359,7 +358,7 @@ impl ScheduleData {
         pri.finish();
     }
 
-    fn present_schedule(&mut self, days: Vec<dt>) {
+    fn present_schedule(&mut self, days: Vec<DayType>) {
         let mut day_indices: Vec<usize> = Vec::new();
         let mut actual_days: Vec<&Day> = Vec::new();
         for day in &days {

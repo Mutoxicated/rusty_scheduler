@@ -22,8 +22,13 @@ pub fn help() {
     println!("-paste_pattern [day(s)]");
     println!("-find_pattern <optional:name> {}\n","(not yet added)".custom_color(*GREY));
 
-    println!("Example: add_pattern [Monday,Tuesday]");
-    println!("Example: copy_pattern [sun] Basketball\n");
+    println!("{} add_pattern [Monday,Tuesday]","Example:".bright_blue());
+    println!("{} copy_pattern [Sunday] Basketball\n","Example:".bright_blue());
+
+    println!("{} You also can abbreviate the days down to the three first letters! Commands can also be abbreviated.\n","Tip".green());
+
+    println!("{} add [mon,tue]","Example:".bright_blue());
+    println!("{} copy [sun] Basketball\n","Example:".bright_blue());
 
     println!(
         "{}",

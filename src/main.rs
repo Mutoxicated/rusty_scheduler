@@ -10,11 +10,77 @@ use colored::{ColoredString, Colorize};
 use global::*;
 use program::{Program, ProgramInfo};
 use pst_data::Data;
-use std::{io::stdin, thread::{self, sleep}, time::Duration,sync::{Mutex,Arc}};
+use std::{ffi::OsStr, io::stdin, sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
 use time::{day::Day,Time};
 use utils::*;
+use tray_item::{TrayItem,IconSource};
+
+fn intro(logo_lines:&[ColoredString],program:&Arc<Mutex<Program>>,program_info:&Arc<Mutex<ProgramInfo>>){
+    let mut tray = TrayItem::new(
+        "Tray Example",
+        IconSource::Resource("name-of-icon-in-rc-file"),
+    )
+    .unwrap();
+
+    tray.add_label("Tray Label").unwrap();
+
+    println!("Welcome to the...");
+
+    let mut index: usize = 0;
+    sleep(Duration::new(0, milli_to_nano(250)));
+    loop {
+        sleep(Duration::new(0, milli_to_nano(50)));
+
+        println!("{}", logo_lines[index]);
+
+        index += 1;
+
+        if index == logo_lines.len() {
+            body(logo_lines, program, program_info);
+            break;
+        }
+    }
+}
+
+fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&Arc<Mutex<ProgramInfo>>) {
+    let mut input: String = String::new();
+    loop {
+        stdin().read_line(&mut input).unwrap();
+
+        if program_info.lock().unwrap().command_finished {
+            match input.trim() {
+                "help" => {
+                    help();
+                    input.clear();
+                    continue;
+                }
+                "exit" => {
+                    program.lock().unwrap().exit();
+                    input.clear();
+                    continue;
+                },
+                "intro" => {
+                    intro(logo_lines,program,program_info);
+                    continue;
+                }
+                _ => (),
+            };
+        }
+
+        program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
+
+        input.clear();
+    }
+}
 
 fn main() {
+    let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("zazapolo")).unwrap();
+    
+    tray.add_menu_item("Hello", || {
+        println!("Hello!");
+    })
+    .unwrap();
+
     Data::get_aumid();
 
     let mut pr = Program::new();
@@ -24,7 +90,13 @@ fn main() {
     Data::read(&mut pr);
 
     let mut input: String = String::new();
-    let logo_lines: Vec<ColoredString> = vec![
+
+    let day_time = Local::now();
+    let (time,_) = process_time(&day_time.time().to_string());
+    let day = day_time.weekday() as u32;
+    pri.today = Day::from_u32(day);
+
+    let logo_lines: Arc<Vec<ColoredString>> = Arc::new(vec![
         r"   ____              __       ".custom_color(*RUSTY),
         r"   / __ \__  _______/ /___  __".custom_color(*RUSTY),
         r"  / /_/ / / / / ___/ __/ / / /".custom_color(*RUSTY),
@@ -37,12 +109,7 @@ fn main() {
         r" ___/ / /__/ / / /  __/ /_/ / /_/ / /  __/ /    ".custom_color(*LIGHTBLUE),
         r"/____/\___/_/ /_/\___/\__,_/\__,_/_/\___/_/     ".custom_color(*LIGHTBLUE),
         r"                                                ".custom_color(*LIGHTBLUE),
-    ];
-
-    let day_time = Local::now();
-    let (time,_) = process_time(&day_time.time().to_string());
-    let day = day_time.weekday() as u32;
-    pri.today = Day::from_u32(day);
+    ]);
 
     println!("Welcome to the...");
 
@@ -102,26 +169,5 @@ fn main() {
         }
     });
 
-    let mut input: String = String::new();
-    loop {
-        stdin().read_line(&mut input).unwrap();
-
-        match input.trim() {
-            "help" => {
-                help();
-                input.clear();
-                continue;
-            }
-            "exit" => {
-                program.lock().unwrap().exit();
-                input.clear();
-                continue;
-            }
-            _ => (),
-        };
-
-        program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
-
-        input.clear();
-    }
+    body(&logo_lines,&program,&program_info);
 }
