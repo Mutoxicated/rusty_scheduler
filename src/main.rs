@@ -85,13 +85,19 @@ fn main() {
         (get_hour(time.as_str()),
         get_minutes(time.as_str()),
         secs.parse().unwrap());
+        
         let mut timee:Time = Time::new(
             hours,
             mins,
             seconds);
+
+        let mut next_minute:i32 = 1;
         loop {
-            sleep(Duration::new(60,0));
-            timee.tick_min();
+            sleep(Duration::new(next_minute as u64,0));
+            timee.update(Local::now().format("%H:%M:%S").to_string());
+            next_minute = 60-timee.seconds;
+            //println!("{next_minute}");
+            //timee.print();
             cloned_program.lock().unwrap().check_patterns(timee.hours,timee.minutes,cloned_program_info.lock().unwrap().today.clone());
         }
     });
