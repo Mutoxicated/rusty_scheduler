@@ -72,14 +72,32 @@ impl Day {
         self.patterns.sort();
     }
 
-    pub fn add_pattern(&mut self, pattern: &Pattern) {
+    pub fn pattern_exists(&mut self, name:&str) -> bool {
+        for pattern in &self.patterns {
+            if pattern.name == *name {
+                return true
+            }
+        }
+        false
+    }
+
+    pub fn copy_pattern(&mut self, name:&str) -> Option<Pattern> {
+        for pattern in &self.patterns {
+            if pattern.name == name {
+                return Some(pattern.clone());
+            }
+        }
+        None
+    }
+
+    pub fn add_pattern(&mut self, pattern: Pattern) {
         self.patterns.push(pattern.clone());
         self.chronologicalize();
     }
 
     pub fn remove_pattern(&mut self, name: String, all: bool) {
         for i in 0..self.patterns.len() {
-            if self.patterns[i].name == name {
+            if self.patterns[i].name == name || name.is_empty() {
                 self.patterns.remove(i);
                 if !all {
                     return;

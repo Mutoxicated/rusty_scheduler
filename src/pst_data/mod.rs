@@ -3,11 +3,13 @@ use crate::time::ScheduleData;
 use file_into_string::*;
 use std::fs::File;
 use std::path::Path;
+use std::sync::RwLock;
 use std::{env, fs};
 
 use lazy_static::lazy_static;
 lazy_static! {
     static ref DATA_PATH: String = "./data.json".to_string();
+    pub static ref ABSOLUTE_APP_PATH: RwLock<String> = RwLock::new("".to_string());
 }
 
 pub struct Data {}
@@ -16,7 +18,9 @@ impl Data {
     pub fn read(pr: &mut Program) {
         let exe = env::current_exe().unwrap();
         let dir = exe.parent().expect("Exe must be in some directory");
-        println!("Current dir: {:?}", dir);
+        let mut path = ABSOLUTE_APP_PATH.write().unwrap();
+        *path = dir.as_os_str().to_string_lossy().to_string();
+        println!("Current dir: {}", dir.to_str().unwrap());
 
         println!("Reading...");
         let path = Path::new(DATA_PATH.as_str());

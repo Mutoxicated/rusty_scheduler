@@ -1,7 +1,7 @@
 use crate::utils::{get_hour, get_minutes};
 use colored::{ColoredString, Colorize};
 use serde_derive::{Deserialize, Serialize};
-use notify_rust::{Timeout,Notification};
+use winrt_notification::{Toast,Duration};
 
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Pattern {
@@ -52,11 +52,10 @@ impl Pattern {
 
     pub fn notify(&self){
         //println!("{}","Notification!".green());
-        Notification::new()
-            .summary(self.name.as_str())
-            .body(self.desc.as_str())
-            .timeout(Timeout::Milliseconds(6000))
-            .finalize()
+        Toast::new(Toast::POWERSHELL_APP_ID)
+            .title(&self.name)
+            .text1(&self.desc)
+            .duration(Duration::Short)
             .show()
             .unwrap();
     }

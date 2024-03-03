@@ -1,3 +1,5 @@
+
+
 mod arg_parser;
 mod global;
 mod program;
@@ -13,8 +15,32 @@ use pst_data::Data;
 use std::{io::stdin, thread::{self, sleep}, time::Duration,sync::{Mutex,Arc}};
 use time::{day::Day,Time};
 use utils::*;
+use winrt_notification::{Duration as winDur,Toast};
+use windows::ApplicationModel;
 
 fn main() {
+    let app_info = ApplicationModel::AppInfo::Current();
+
+    let mut aumid:String = "".to_owned();
+
+    if let Ok(ai) = app_info {
+        let tst = ai.AppUserModelId().unwrap();
+        let str = tst.clone().to_string();
+        aumid = str;
+        
+    }
+
+    if aumid.is_empty() {
+        aumid = Toast::POWERSHELL_APP_ID.to_string();
+    }
+
+    Toast::new(aumid.as_str())
+        .title("Lol")
+        .text1("Test1")
+        .text2("Test2")
+        .duration(winDur::Short)
+        .show()
+        .unwrap();
     let mut pr = Program::new();
     let mut pri = ProgramInfo::new();
 
@@ -94,29 +120,26 @@ fn main() {
         }
     });
 
-    thread::spawn(move || {
-        let mut input: String = String::new();
-        loop {
-            stdin().read_line(&mut input).unwrap();
-    
-            match input.trim() {
-                "help" => {
-                    help();
-                    input.clear();
-                    continue;
-                }
-                "exit" => {
-                    program.lock().unwrap().exit();
-                    input.clear();
-                    continue;
-                }
-                _ => (),
-            };
-    
-            program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
-    
-            input.clear();
-        }
-    }).join().unwrap();
+    let mut input: String = String::new();
+    loop {
+        stdin().read_line(&mut input).unwrap();
 
+        match input.trim() {
+            "help" => {
+                help();
+                input.clear();
+                continue;
+            }
+            "exit" => {
+                program.lock().unwrap().exit();
+                input.clear();
+                continue;
+            }
+            _ => (),
+        };
+
+        program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
+
+        input.clear();
+    }
 }

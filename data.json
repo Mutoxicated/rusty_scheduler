@@ -1,36 +1,112 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": []
-  },
-  "tuesday": {
-    "day_type": "Tuesday",
-    "patterns": []
-  },
-  "wednesday": {
-    "day_type": "Wednesday",
-    "patterns": []
-  },
-  "thursday": {
-    "day_type": "Thursday",
-    "patterns": []
-  },
-  "friday": {
-    "day_type": "Friday",
     "patterns": [
       {
-        "name": "ewretrgfhgfvc",
-        "desc": "waefsrgdethytjmh",
-        "time": "20:12",
-        "hours": 20,
-        "mins": 12,
+        "name": "weqrrf",
+        "desc": "pwoewuibfvuiWIOEBDSNF",
+        "time": "02:49",
+        "hours": 2,
+        "mins": 49,
         "special": false
+      },
+      {
+        "name": "to",
+        "desc": "wrdgfhdgnhmghrer",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      },
+      {
+        "name": "to",
+        "desc": "wrdgfhdgnhmghrer",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      },
+      {
+        "name": "popopo",
+        "desc": "gay",
+        "time": "19:00",
+        "hours": 19,
+        "mins": 0,
+        "special": true
       }
     ]
   },
+  "tuesday": {
+    "day_type": "Tuesday",
+    "patterns": [
+      {
+        "name": "to",
+        "desc": "wrdgfhdgnhmghrer",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      },
+      {
+        "name": "popopo",
+        "desc": "gay",
+        "time": "19:00",
+        "hours": 19,
+        "mins": 0,
+        "special": true
+      }
+    ]
+  },
+  "wednesday": {
+    "day_type": "Wednesday",
+    "patterns": [
+      {
+        "name": "to",
+        "desc": "wrdgfhdgnhmghrer",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      },
+      {
+        "name": "popopo",
+        "desc": "gay",
+        "time": "19:00",
+        "hours": 19,
+        "mins": 0,
+        "special": true
+      }
+    ]
+  },
+  "thursday": {
+    "day_type": "Thursday",
+    "patterns": [
+      {
+        "name": "popopo",
+        "desc": "gay",
+        "time": "19:00",
+        "hours": 19,
+        "mins": 0,
+        "special": true
+      }
+    ]
+  },
+  "friday": {
+    "day_type": "Friday",
+    "patterns": []
+  },
   "saturday": {
     "day_type": "Saturday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "popopo",
+        "desc": "gay",
+        "time": "19:00",
+        "hours": 19,
+        "mins": 0,
+        "special": true
+      }
+    ]
   },
   "sunday": {
     "day_type": "Sunday",

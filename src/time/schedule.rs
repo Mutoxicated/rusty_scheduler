@@ -77,14 +77,98 @@ impl ScheduleData {
         }
     }
 
-    fn remove_pattern(&mut self, pri: &mut ProgramInfo) {
+    fn copy_pattern(&mut self, pri: &mut ProgramInfo){
         if let Err(er) = &pri.args.days {
             println!("{er}");
             pri.finish();
             return;
         }
+
+        if let Err(er) = &pri.args.name {
+            println!("{er}");
+            pri.finish();
+            return;
+        }
+
+        let dayt = Day::from_string(pri.args.days.as_ref().unwrap()[0].as_str());
+
+        if dayt == DayType::Na {
+            println!("{}",ArgError::InvalidDay);
+            pri.finish();
+            return;
+        }
+
+        let day = self.get_day(dayt.clone()).unwrap();
+
+        let name = pri.args.name.as_ref().unwrap().as_str();
+
+        if !day.pattern_exists(name){
+            println!("{}",ArgError::InvalidPatternName);
+        }else {
+            println!("Copied {} '{}' from {dayt:?}!","Pattern".yellow(),name);
+            pri.pattern_copy_buffer = Some(day.copy_pattern(name).unwrap());
+        }
+        pri.finish();
+    }
+
+    fn paste_pattern(&mut self, pri: &mut ProgramInfo) {
+        if pri.pattern_copy_buffer.is_none() {
+            println!("{} You didn't copy anything to paste!", "Error!".red());
+            pri.finish();
+            return;
+        }
         let mut valid_days: Vec<dt> = Vec::new();
-        ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
+
+        if let Ok(name) = &pri.args.name {
+            valid_days = vec![
+                Day::from_string(name.as_str())
+            ];
+        }else {
+            if let Err(er) = &pri.args.days {
+                println!("{er}");
+                pri.finish();
+                return;
+            }
+            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
+        }
+
+        if valid_days[0] == DayType::Na || valid_days.is_empty() {
+            println!("{}",ArgError::InvalidDay);
+            pri.finish();
+            return;
+        }
+
+        for vd in &valid_days {
+            let day = self.get_day(vd.clone()).unwrap();
+
+            day.add_pattern(pri.pattern_copy_buffer.as_ref().unwrap().clone());
+        }
+        println!("Pasted {} '{}' onto {:?}!","Pattern".yellow(),pri.pattern_copy_buffer.as_ref().unwrap().name,valid_days);
+        pri.pattern_copy_buffer = None;
+        pri.finish();
+    }
+
+    fn remove_pattern(&mut self, pri: &mut ProgramInfo) {
+        let mut valid_days: Vec<dt> = Vec::new();
+        if let Err(er) = &pri.args.days {
+            if !pri.args.all {
+                println!("{er}");
+                pri.finish();
+                return;
+            }else {
+                valid_days = vec![
+                    dt::Monday,
+                    dt::Tuesday,
+                    dt::Wednesday,
+                    dt::Thursday,
+                    dt::Friday,
+                    dt::Saturday,
+                    dt::Sunday,
+                ];
+            }
+        }else {
+            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
+        }
 
         pri.steps += 1;
 
@@ -93,18 +177,20 @@ impl ScheduleData {
             pri.finish();
             return;
         }
-        if pri.args.name.is_err() {
-            if pri.steps == 0 {
-                println!("Please provide the name of the {}", "pattern".yellow());
-                return;
-            } else if pri.steps == 1 {
-                pri.input_pattern.name = pri.input.clone();
-                println!("Remove all the patterns with that name?");
+        if !pri.args.all {
+            if pri.args.name.is_err() {
+                if pri.steps == 0 {
+                    println!("Please provide the name of the {}", "pattern".yellow());
+                    return;
+                } else if pri.steps == 1 {
+                    pri.input_pattern.name = pri.input.clone();
+                    println!("Remove all the patterns with that name?");
+                }
+            } else {
+                pri.input_pattern.name = pri.args.name.as_ref().unwrap().to_owned();
             }
-        } else {
-            pri.input_pattern.name = pri.args.name.as_ref().unwrap().to_owned();
+            pri.args.all = yes_or_no(pri.input.clone());
         }
-        pri.args.all = yes_or_no(pri.input.clone());
 
         for day in &valid_days {
             self.get_day(day.clone())
@@ -112,11 +198,18 @@ impl ScheduleData {
                 .remove_pattern(pri.input_pattern.name.clone(), pri.args.all);
         }
 
-        println!(
-            "{} '{}' removed from {valid_days:?}!",
-            "Pattern".yellow(),
-            pri.input_pattern.name
-        );
+        if pri.input_pattern.name.is_empty() {
+            println!(
+                "All {} removed from {valid_days:?}!",
+                "Patterns".yellow()
+            );
+        }else {
+            println!(
+                "{} '{}' removed from {valid_days:?}!",
+                "Pattern".yellow(),
+                pri.input_pattern.name
+            );
+        }
         pri.finish();
     }
 
@@ -191,7 +284,7 @@ impl ScheduleData {
         for valid_day in &valid_days {
             self.get_day(valid_day.clone())
                 .unwrap()
-                .add_pattern(&pri.input_pattern);
+                .add_pattern(pri.input_pattern.clone());
         }
 
         println!(
@@ -317,6 +410,8 @@ impl Receive for ScheduleData {
             "remove_pattern" => self.remove_pattern(pri),
             "today" => self.today(pri),
             "get_schedule" => self.get_schedule(pri),
+            "copy_pattern" => self.copy_pattern(pri),
+            "paste_pattern" => self.paste_pattern(pri),
             _ => (),
         }
     }

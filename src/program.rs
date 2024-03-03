@@ -16,6 +16,7 @@ pub struct ProgramInfo {
     pub command_name: String,
     pub args: Args,
     pub input_pattern: Pattern,
+    pub pattern_copy_buffer: Option<Pattern>,
     pub command_finished: bool,
     pub input: String,
     pub steps: i32,
@@ -28,6 +29,7 @@ impl ProgramInfo {
             args: Args::empty(),
             command_name: String::new(),
             input_pattern: Pattern::new_empty(),
+            pattern_copy_buffer: None,
             command_finished: true,
             input: String::new(),
             steps: -1,
@@ -63,7 +65,7 @@ impl Program {
 
     pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
         pri.input = input.to_string();
-        if pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel" {
+        if !pri.command_finished && (pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel") {
             println!("Stopped Command.");
             pri.finish();
             return;

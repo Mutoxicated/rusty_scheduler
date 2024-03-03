@@ -1,5 +1,8 @@
 [package]
 name = "rusty_scheduler"
+description = "A Scheduler to organize your week"
+author = "MutoX"
+license = "MIT"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,4 +16,9 @@ serde_derive = "1.0.197"
 serde_json = "1.0.114"
 file_into_string = "*"
 colored = "2.1.0"
-notify-rust = "4.10.0"
+winrt-notification = "0.5.1"
+[dependencies.windows]
+version = "0.53.0"
+features = [
+    "ApplicationModel",
+]

@@ -17,19 +17,17 @@ pub fn help() {
     println!("-get_schedule [optional:day(s)]");
     println!("-add_pattern [day(s)]");
     println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
-    println!("-change_pattern [day(s)] <optional:name>");
-    println!("-clear_patterns [day(s)]");
-    println!("-copy_pattern [day] <optional:name>");
+    println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
+    println!("-copy_pattern [day] <name>");
     println!("-paste_pattern [day(s)]");
-    println!("-find_pattern <optional:name>\n");
+    println!("-find_pattern <optional:name> {}\n","(not yet added)".custom_color(*GREY));
 
     println!("Example: add_pattern [Monday,Tuesday]");
     println!("Example: copy_pattern [Sunday] Basketball\n");
 
     println!(
         "{}",
-        "(note: in the <all> parameter, you either put nothing or the word 'all')"
-            .custom_color(*GREY)
+        "(note: in the <all> parameter, you either put nothing or the word 'all')".custom_color(*GREY)
     );
 }
 
