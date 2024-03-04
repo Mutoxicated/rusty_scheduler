@@ -57,12 +57,16 @@ impl Program {
             console: ConsoleWindow::init(PCSTR::from_raw("Rusty_Scheduler\0".as_bytes().as_ptr()))
         }
     }
+    
+    fn command_is_stop(command_name:String)->bool{
+        command_name == "stop" || command_name == "cancel"
+    }
 
     pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
         pri.input = input.to_string();
         //println!("Debug: command_finished->{}",pri.command_finished);
 
-        if !pri.command_finished && (pri.input.to_lowercase() == "stop" || pri.input.to_lowercase() == "cancel") {
+        if !pri.command_finished && Program::command_is_stop(pri.input.to_lowercase()) {
             println!("Stopped Command.");
             pri.finish();
             return;
@@ -72,16 +76,21 @@ impl Program {
             self.data.receive(pri);
             return;
         }
-        let mut parameterless_command: String = input.to_lowercase().clone();
-        let mut parameters = String::new();
+
+        let mut parameterless_command: String = input.to_lowercase();
+        let mut parameters:&str = "";
+
         let index_at_space = parameterless_command.find(' ');
+
         if let Some(i) = index_at_space {
-            parameters = input[i + 1..input.len()].to_string();
-            parameterless_command.replace_range(i..input.len(), "");
+            parameters = &input[i + 1..input.len()];
+            parameterless_command = input[0..i].to_string();
         }
+        
         format_command_name(&mut parameterless_command);
-        pri.args = Args::get_args(&parameters);
-        pri.command_name = parameterless_command.clone();
+
+        pri.args = Args::get_args(parameters);
+        pri.command_name = parameterless_command;
         pri.command_finished = false;
 
         self.data.receive(pri);

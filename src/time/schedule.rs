@@ -269,10 +269,11 @@ impl ScheduleData {
                 pri.finish();
                 return;
             }
-            pri.input_pattern.change_time(formatted_time.unwrap().as_str());
+            let fmt_time_str = formatted_time.as_ref().unwrap().as_str();
+            pri.input_pattern.change_time(get_hour(fmt_time_str),get_minutes(fmt_time_str));
             println!(
                 "Please provide a description. {}",
-                "(you can leave it empty)".custom_color(*GREY)
+                "(and keep it short!)".custom_color(*GREY)
             );
             return;
         }
@@ -360,7 +361,7 @@ impl ScheduleData {
         pri.finish();
     }
 
-    fn present_schedule(&mut self, days: Vec<DayType>) {
+    fn present_schedule(&mut self, days: Vec<DayType>) {//TODO: Fix problem with long descriptions
         let mut day_indices: Vec<usize> = Vec::new();
         let mut actual_days: Vec<&Day> = Vec::new();
         for day in &days {
@@ -373,6 +374,7 @@ impl ScheduleData {
             line1.push_str(format!("{:?}", day.day_type).as_str());
             line1.push_str(&DAY_SPACE);
         }
+        line1.push_str(&DAY_SPACE);
         println!("{line1}");
 
         let width = line1.len();
@@ -396,6 +398,7 @@ impl ScheduleData {
 
             for i in 0..actual_days.len() {
                 current_pattern_line = actual_days[i].get_pattern_string(curr_pat, curr_pat_inner);
+
                 if let Some(line) = current_pattern_line {
                     succesful_pattern_lines.push(true);
                     curr_line.replace_range(

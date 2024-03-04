@@ -18,16 +18,6 @@ use utils::*;
 use tray_item::{TrayItem,IconSource};
 
 fn intro(logo_lines:&[ColoredString],program:&Arc<Mutex<Program>>,program_info:&Arc<Mutex<ProgramInfo>>){    
-    // let tray = TrayItem::new(
-    //     "Tray Example",
-    //     IconSource::Resource(""),
-    // )
-    // .unwrap();
-
-    // tray.add_menu_item("Open", || {
-
-    // });
-
     println!("Welcome to the...");
 
     let mut index: usize = 0;
@@ -87,11 +77,6 @@ fn main() {
     let program:Arc<Mutex<Program>> = Arc::new(Mutex::new(Program::new()));
     let program_info:Arc<Mutex<ProgramInfo>> = Arc::new(Mutex::new(ProgramInfo::new()));
 
-    //The idea with this variable is that, since Data implements Drop, when main ends 
-    //and the data goes out of scope, it will also call the 'Drop' function from the Drop trait
-    //to free the memory, but this also lets us use this as an "OnExit" callback. This wont
-    //really work for crashes, or direct exit calls, but it will cover a good amount of situations.
-
     Data::read(program.as_ref().lock().unwrap().borrow_mut());
 
     let day_time = Local::now();
@@ -144,7 +129,7 @@ fn main() {
     //Setup System Tray
     let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("rusty_sched")).unwrap();
 
-    tray.add_menu_item("Show", move || {
+    tray.add_menu_item("Open", move || {
         cloned_program2.as_ref().lock().unwrap().console.show();
     })
     .unwrap();
@@ -160,22 +145,19 @@ fn main() {
     .unwrap();
 
     thread::spawn(move || {
-        let day_time = Local::now();
-        let (time,secs) = process_time(&day_time.time().to_string());
-        let (hours,mins,seconds) = 
-            (get_hour(time.as_str()),
-            get_minutes(time.as_str()),
-            secs.parse().unwrap());
+        let mut now = Local::now();
+        let hours:u64 = now.hour().into();
+        let mins:u64 = now.minute().into();
+        let secs:u64 = now.second().into();
         
-        let mut timee:Time = Time::new(
-            hours,
-            mins,
-            seconds);
+        let mut timee:Time = Time::new(hours,mins,secs);
 
         let mut next_minute:u64 = 1;
         loop {
             sleep(Duration::new(next_minute,0));
-            let now = Local::now();
+
+            now = Local::now();
+
             timee.update(now.hour(),now.minute(),now.second());
             next_minute = 60-timee.seconds;
             //println!("{next_minute}");

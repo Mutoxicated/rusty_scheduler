@@ -2,7 +2,7 @@ use crate::program::Program;
 use crate::time::ScheduleData;
 use file_into_string::*;
 use std::fs::File;
-use std::{env, fs};
+use std::fs;
 
 use lazy_static::lazy_static;
 lazy_static! {
@@ -14,9 +14,9 @@ pub struct Data {}
 
 impl Data {
     pub fn read(pr: &mut Program) {
-        let exe = env::current_exe().unwrap();
-        let dir = exe.parent().expect("Exe must be in some directory");
-        println!("Current dir: {}", dir.to_str().unwrap());
+        //let exe = env::current_exe().unwrap();
+        //let dir = exe.parent().expect("Exe must be in some directory");
+        //println!("Current dir: {}", dir.to_str().unwrap());
 
         println!("Reading...");
         let path =DATA_PATH.as_str();
@@ -43,8 +43,4 @@ impl Data {
         )
         .expect("Write failed");
     }
-
-    // pub fn get_day(pr: &Program, day_type: dt) -> Result<&Day, ()> {
-    //     pr.data.get_day(day_type)
-    // }
 }

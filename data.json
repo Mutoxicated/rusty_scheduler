@@ -13,54 +13,18 @@
   },
   "thursday": {
     "day_type": "Thursday",
-    "patterns": [
-      {
-        "name": "pi",
-        "desc": "",
-        "time": "19:00",
-        "hours": 19,
-        "mins": 0,
-        "special": false
-      }
-    ]
+    "patterns": []
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": [
-      {
-        "name": "oi",
-        "desc": "",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      }
-    ]
+    "patterns": []
   },
   "saturday": {
     "day_type": "Saturday",
-    "patterns": [
-      {
-        "name": "ui",
-        "desc": "",
-        "time": "19:00",
-        "hours": 19,
-        "mins": 0,
-        "special": true
-      }
-    ]
+    "patterns": []
   },
   "sunday": {
     "day_type": "Sunday",
-    "patterns": [
-      {
-        "name": "oi",
-        "desc": "",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      }
-    ]
+    "patterns": []
   }
 }

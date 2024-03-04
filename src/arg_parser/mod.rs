@@ -54,7 +54,7 @@ impl Args {
         let mut name: String = String::new();
         let mut all: bool = false;
 
-        let mut str = string;
+        let mut parameters = string;
 
         let mut unparsed_days: String;
 
@@ -62,7 +62,7 @@ impl Args {
 
         let mut anchor: &str = " ";
 
-        if str.is_empty() {
+        if parameters.is_empty() {
             return Self {
                 name: res_name,
                 days: Err(ArgError::Empty),
@@ -70,8 +70,8 @@ impl Args {
             };
         }
 
-        let index = str.find('[');
-        let index2 = str.find(']');
+        let index = parameters.find('[');
+        let index2 = parameters.find(']');
 
         if index.is_none() {
             array_starts = false;
@@ -83,58 +83,47 @@ impl Args {
         if array_starts && array_ends {
             let mut temp_i: Option<usize>;
 
-            unparsed_days = str[index.unwrap() + 1..index2.unwrap()].to_string();
+            unparsed_days = parameters[index.unwrap() + 1..index2.unwrap()].to_string();
 
-            let mut valid: bool = true;
-            if unparsed_days.find('[').is_some() {
-                valid = false;
-            }
-            if unparsed_days.find(']').is_some() {
-                valid = false;
-            }
-            if valid {
-                for _ in 0..7 {
+            for _ in 0..7 {
+                temp_i = unparsed_days.find(anchor);
+                //println!("{:?}", temp_i);
+                if temp_i.is_none() {
+                    anchor = ",";
                     temp_i = unparsed_days.find(anchor);
-                    //println!("{:?}", temp_i);
-                    if temp_i.is_none() {
-                        anchor = ",";
-                        temp_i = unparsed_days.find(anchor);
-                    }
-                    if temp_i.is_none() {
-                        break;
-                    }
-                    if 0 == temp_i.unwrap() {
-                        continue;
-                    }
-                    if unparsed_days[0..temp_i.unwrap() - 1] != *"" {
-                        days.push(unparsed_days[0..temp_i.unwrap()].trim().to_string());
-                    }
-
-                    unparsed_days.replace_range(0..temp_i.unwrap() + 1, "");
-                    unparsed_days = unparsed_days.trim().to_string();
-                    //println!("Debug: unparsed days-> {}", unparsed_days);
+                }
+                if temp_i.is_none() {
+                    break;
+                }
+                if 0 == temp_i.unwrap() {
+                    continue;
+                }
+                if unparsed_days[0..temp_i.unwrap() - 1] != *"" {
+                    days.push(unparsed_days[0..temp_i.unwrap()].trim().to_string());
                 }
 
-                if !unparsed_days.is_empty() {
-                    days.push(unparsed_days.clone());
-                }
+                unparsed_days.replace_range(0..temp_i.unwrap() + 1, "");
+                unparsed_days = unparsed_days.trim().to_string();
+                //println!("Debug: unparsed days-> {}", unparsed_days);
             }
 
-            let mut temp_str = str.to_string();
+            if !unparsed_days.is_empty() {
+                days.push(unparsed_days.clone());
+            }
+            
+            let mut temp_str = parameters.to_string();
             temp_str.replace_range(index.unwrap()..index2.unwrap() + 1, "");
 
-            str = temp_str.as_str();
+            parameters = temp_str.trim();
+            //at this point, the whole days array is removed from parameters and
+            //what is left is potentially <name> <all>
 
-            str = str.trim();
-
-            let mut end_name = str.find(' ');
-
-            //println!("Args: end_name->{end_name:?}");
+            let mut end_name = parameters.find(' ');
 
             if end_name.is_none() {
-                end_name = Some(str.len());
+                end_name = Some(parameters.len());
             } else {
-                let all_string = &str[end_name.unwrap()..str.len()];
+                let all_string = &parameters[end_name.unwrap()..parameters.len()];
                 all = all_string.contains("all");
             }
 
@@ -145,10 +134,11 @@ impl Args {
             }
 
             //name
-            name = str[0..end_name.unwrap()].trim().to_string();
+            name = parameters[0..end_name.unwrap()].trim().to_string();
         } else if !array_starts && !array_ends {
-            name = str.trim().to_string();
+            name = parameters.trim().to_string();
         }
+
         if name == "all"{
             all = true;
             name = "".to_owned();
@@ -164,7 +154,7 @@ impl Args {
             all,
         };
 
-        println!("{res:?}");
+        //println!("{res:?}");
 
         res
     }

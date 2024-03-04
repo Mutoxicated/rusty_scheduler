@@ -1,4 +1,3 @@
-use crate::utils::{get_hour, get_minutes};
 use colored::{ColoredString, Colorize};
 use serde::{Deserialize, Serialize};
 use winrt_notification::{Toast,Duration};
@@ -7,7 +6,6 @@ use winrt_notification::{Toast,Duration};
 pub struct Pattern {
     pub name: String,
     pub desc: String,
-    time: String,
     hours:u64,
     mins:u64,
     pub special: bool,
@@ -23,9 +21,9 @@ impl PartialOrd for Pattern {
 
 impl Ord for Pattern {
     fn cmp(&self, other: &Self) -> Ordering {
-        let comparison = get_hour(&self.time).cmp(&get_hour(&other.time));
+        let comparison = self.hours.cmp(&other.hours);
         if let Ordering::Equal = comparison {
-            return get_minutes(&self.time).cmp(&get_minutes(&other.time));
+            return self.mins.cmp(&other.mins);
         }
         comparison
     }
@@ -36,18 +34,15 @@ impl Pattern {
         Self {
             name: String::new(),
             desc: String::new(),
-            time: String::new(),
             hours:0,
             mins:0,
             special: false,
         }
     }
 
-    pub fn change_time(&mut self,time:&str){
-        self.time = time.to_owned();
-
-        self.hours = get_hour(time);
-        self.mins = get_minutes(time);
+    pub fn change_time(&mut self,hours:u64, mins:u64){
+        self.hours = hours;
+        self.mins = mins;
     }
 
     pub fn notify(&self){
@@ -65,7 +60,7 @@ impl Pattern {
     }
 
     pub fn present(&self, in_detail: bool) {
-        println!("| {}", self.time.blue());
+        println!("| {}{}{}", self.hours.to_string().blue(),":".blue(),self.mins.to_string().blue());
         let colored_name: ColoredString = if self.special {
             self.name.green()
         } else {
@@ -80,7 +75,7 @@ impl Pattern {
 
     pub fn get_stringified(&self, idx: usize, in_detail: bool) -> String {
         if idx == 0 {
-            return format!("| {}", self.time);
+            return format!("| {}{}{}", self.hours.to_string().blue(),":".blue(),self.mins.to_string().blue());
         }
         // let colored_name:ColoredString;
         // if self.special.unwrap() {
