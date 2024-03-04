@@ -1,8 +1,12 @@
+use windows::core::PCSTR;
+
 use crate::arg_parser::Args;
+use crate::pst_data::Data;
 use crate::time::day::DayType;
 use crate::time::Pattern;
 use crate::time::ScheduleData;
 use crate::utils::format_command_name;
+use crate::win::ConsoleWindow;
 
 pub trait Receive {
     fn receive(&mut self, pr: &mut ProgramInfo);
@@ -43,12 +47,14 @@ impl ProgramInfo {
 #[derive(Clone)]
 pub struct Program {
     pub data: ScheduleData,
+    pub console: ConsoleWindow
 }
 
 impl Program {
     pub fn new() -> Self {
         Self {
             data: ScheduleData::new(),
+            console: ConsoleWindow::init(PCSTR::from_raw("Rusty_Scheduler\0".as_bytes().as_ptr()))
         }
     }
 
@@ -84,5 +90,10 @@ impl Program {
     pub fn check_patterns(&mut self,hours:u64,mins:u64,dt:DayType){
         let day = self.data.get_day(dt).unwrap();
         day.check_patterns(hours, mins)
+    }
+
+    pub fn exit(&self){
+        Data::write(self);
+        std::process::exit(0);
     }
 }

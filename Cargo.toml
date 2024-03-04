@@ -17,6 +17,15 @@ file_into_string = "*"
 colored = "2.1.0"
 winrt-notification = "0.5.1"
 tray-item = "0.9.0"
+[dependencies.windows]
+version = "0.53.0"
+features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "ApplicationModel",
+    "Win32_UI_Shell",
+    "Win32_System_Console",
+]
 
 [build-dependencies]
 embed-resource = "2.3"

@@ -2,27 +2,18 @@ use crate::program::Program;
 use crate::time::ScheduleData;
 use file_into_string::*;
 use std::fs::File;
-use std::path::Path;
 use std::{env, fs};
-use std::sync::{Mutex,Arc};
 
 use lazy_static::lazy_static;
 lazy_static! {
     static ref DATA_PATH: String = "./data.json".to_string();
 }
 
-pub struct Data {
-    pub pr:Arc<Mutex<Program>>,
-}
 
-impl Drop for Data {
-    fn drop(&mut self) {
-        self.write();
-    }
-}
+pub struct Data {}
 
 impl Data {
-    pub fn read(&mut self) {
+    pub fn read(pr: &mut Program) {
         let exe = env::current_exe().unwrap();
         let dir = exe.parent().expect("Exe must be in some directory");
         println!("Current dir: {}", dir.to_str().unwrap());
@@ -34,21 +25,21 @@ impl Data {
             Ok(_) => {}
             Err(_) => {
                 File::create(path).expect("Somehow failed to create the json file lol");
-                self.write();
+                Data::write(pr);
                 return;
             }
         }
         let data = file_into_string(file.unwrap()).unwrap();
         let value: ScheduleData = serde_json::from_str(data.as_str()).expect("Couldn't parse the json data.");
-        self.pr.as_ref().lock().unwrap().data.update(value);
+        pr.data.update(value);
     }
 
-    pub fn write(&self) {
+    pub fn write(pr:&Program) {
         println!("Writing...");
 
         fs::write(
             DATA_PATH.as_str(),
-            serde_json::to_string_pretty(&self.pr.lock().unwrap().data).unwrap(),
+            serde_json::to_string_pretty(&pr.data).unwrap(),
         )
         .expect("Write failed");
     }

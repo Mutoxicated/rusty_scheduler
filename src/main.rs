@@ -1,3 +1,4 @@
+mod win;
 mod arg_parser;
 mod global;
 mod program;
@@ -10,10 +11,11 @@ use colored::{ColoredString, Colorize};
 use global::*;
 use program::{Program, ProgramInfo};
 use pst_data::Data;
-use std::{io::stdin, sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
+use std::{borrow::BorrowMut, io::stdin, sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
 use time::{day::Day,Time};
 use utils::*;
-//use tray_item::{TrayItem,IconSource};
+
+use tray_item::{TrayItem,IconSource};
 
 fn intro(logo_lines:&[ColoredString],program:&Arc<Mutex<Program>>,program_info:&Arc<Mutex<ProgramInfo>>){    
     // let tray = TrayItem::new(
@@ -51,6 +53,12 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
 
         if program_info.lock().unwrap().command_finished {
             match input.trim() {
+                "min" => {
+                    program.as_ref().lock().unwrap().console.min();
+                }
+                "hide" => {
+                    program.as_ref().lock().unwrap().console.hide();
+                }
                 "help" => {
                     help();
                     input.clear();
@@ -76,13 +84,6 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
 }
 
 fn main() {
-    // let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("zazapolo")).unwrap();
-    
-    // tray.add_menu_item("Hello", || {
-    //     println!("Hello!");
-    // })
-    // .unwrap();
-
     let program:Arc<Mutex<Program>> = Arc::new(Mutex::new(Program::new()));
     let program_info:Arc<Mutex<ProgramInfo>> = Arc::new(Mutex::new(ProgramInfo::new()));
 
@@ -90,11 +91,8 @@ fn main() {
     //and the data goes out of scope, it will also call the 'Drop' function from the Drop trait
     //to free the memory, but this also lets us use this as an "OnExit" callback. This wont
     //really work for crashes, or direct exit calls, but it will cover a good amount of situations.
-    let mut data:Data = Data {
-        pr:Arc::clone(&program)
-    };
 
-    data.read();
+    Data::read(program.as_ref().lock().unwrap().borrow_mut());
 
     let day_time = Local::now();
     let (time,_) = process_time(&day_time.time().to_string());
@@ -138,7 +136,28 @@ fn main() {
     println!("{}help{}","Type '".green(),"' if you're unfamiliar with the commands.".green());
 
     let cloned_program = Arc::clone(&program);
+    let cloned_program2 = Arc::clone(&program);
+    let cloned_program3 = Arc::clone(&program);
+    let cloned_program4 = Arc::clone(&program);
     let cloned_program_info = Arc::clone(&program_info);
+
+    //Setup System Tray
+    let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("rusty_sched")).unwrap();
+
+    tray.add_menu_item("Show", move || {
+        cloned_program2.as_ref().lock().unwrap().console.show();
+    })
+    .unwrap();
+
+    tray.add_menu_item("Hide", move || {
+        cloned_program3.as_ref().lock().unwrap().console.hide();
+    })
+    .unwrap();
+
+    tray.add_menu_item("Exit", move || {
+        cloned_program4.as_ref().lock().unwrap().exit();
+    })
+    .unwrap();
 
     thread::spawn(move || {
         let day_time = Local::now();
@@ -166,4 +185,6 @@ fn main() {
     });
 
     body(&logo_lines,&program,&program_info);
+
+    Data::write(program.as_ref().lock().unwrap().borrow_mut());
 }
