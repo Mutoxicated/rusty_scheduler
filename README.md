@@ -22,4 +22,4 @@ Organize your week by setting recurring and special events in place and let it n
 
 Currently there is only a windows version of the program.
 
-Download the .exe file from the newest release and put it in its own folder, as it automatically creates a .json file in the directory it's in to store the schedule data.
+Download the .exe file from the newest release and put it in its own folder, as it automatically creates a .json file in the directory it's in when the app launches to store the schedule data.
