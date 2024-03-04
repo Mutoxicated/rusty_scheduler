@@ -17,3 +17,9 @@ This is the...
 Organize your week by setting recurring and special events in place and let it notify you of them while it runs in the background!
 
 **THIS PROJECT IS STILL WORK IN PROGRESS.**
+
+## Installation
+
+Currently there is only a windows version of the program.
+
+Download the .exe file from the newest release and put it in its own folder, as it automatically creates a .json file in the directory it's in to store the schedule data.
