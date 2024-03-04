@@ -1,12 +1,8 @@
 use crate::arg_parser::Args;
-use crate::global::*;
-use crate::pst_data::Data;
 use crate::time::day::DayType;
 use crate::time::Pattern;
 use crate::time::ScheduleData;
 use crate::utils::format_command_name;
-
-use colored::Colorize;
 
 pub trait Receive {
     fn receive(&mut self, pr: &mut ProgramInfo);
@@ -56,13 +52,6 @@ impl Program {
         }
     }
 
-    pub fn exit(&self) {
-        println!("{}", "|".custom_color(*GREY));
-        println!("Exiting...");
-        Data::write(self);
-        std::process::exit(0);
-    }
-
     pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
         pri.input = input.to_string();
         //println!("Debug: command_finished->{}",pri.command_finished);
@@ -92,7 +81,7 @@ impl Program {
         self.data.receive(pri);
     }
 
-    pub fn check_patterns(&mut self,hours:i32,mins:i32,dt:DayType){
+    pub fn check_patterns(&mut self,hours:u64,mins:u64,dt:DayType){
         let day = self.data.get_day(dt).unwrap();
         day.check_patterns(hours, mins)
     }

@@ -64,7 +64,7 @@ pub fn yes_or_no(string: String) -> bool {
     string.contains('y')
 }
 
-pub fn get_hour(time: &str) -> i32 {
+pub fn get_hour(time: &str) -> u64 {
     let idx = time.find(':');
     let hour = time.trim()
         [0..idx.expect("No number was found when getting the hour of the given time string.")]
@@ -73,7 +73,7 @@ pub fn get_hour(time: &str) -> i32 {
     hour
 }
 
-pub fn get_minutes(time: &str) -> i32 {
+pub fn get_minutes(time: &str) -> u64 {
     let idx = time.find(':');
     let minutes = time.trim()[idx
         .expect("No number was found when getting the minutes of the given time string.")

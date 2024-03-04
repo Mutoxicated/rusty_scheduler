@@ -1,82 +1,48 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": [
-      {
-        "name": "to",
-        "desc": "wrdgfhdgnhmghrer",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      }
-    ]
+    "patterns": []
   },
   "tuesday": {
     "day_type": "Tuesday",
-    "patterns": [
-      {
-        "name": "to",
-        "desc": "wrdgfhdgnhmghrer",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      },
-      {
-        "name": "popopo",
-        "desc": "gay",
-        "time": "19:00",
-        "hours": 19,
-        "mins": 0,
-        "special": true
-      }
-    ]
+    "patterns": []
   },
   "wednesday": {
     "day_type": "Wednesday",
-    "patterns": [
-      {
-        "name": "to",
-        "desc": "wrdgfhdgnhmghrer",
-        "time": "12:00",
-        "hours": 12,
-        "mins": 0,
-        "special": false
-      },
-      {
-        "name": "popopo",
-        "desc": "gay",
-        "time": "19:00",
-        "hours": 19,
-        "mins": 0,
-        "special": true
-      }
-    ]
+    "patterns": []
   },
   "thursday": {
     "day_type": "Thursday",
     "patterns": [
       {
-        "name": "popopo",
-        "desc": "gay",
+        "name": "pi",
+        "desc": "",
         "time": "19:00",
         "hours": 19,
         "mins": 0,
-        "special": true
+        "special": false
       }
     ]
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "oi",
+        "desc": "",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      }
+    ]
   },
   "saturday": {
     "day_type": "Saturday",
     "patterns": [
       {
-        "name": "popopo",
-        "desc": "gay",
+        "name": "ui",
+        "desc": "",
         "time": "19:00",
         "hours": 19,
         "mins": 0,
@@ -86,6 +52,15 @@
   },
   "sunday": {
     "day_type": "Sunday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "oi",
+        "desc": "",
+        "time": "12:00",
+        "hours": 12,
+        "mins": 0,
+        "special": false
+      }
+    ]
   }
 }

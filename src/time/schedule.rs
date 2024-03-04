@@ -4,7 +4,7 @@ use crate::program::{ProgramInfo, Receive};
 use crate::time::day::{Day, DayType};
 use crate::utils::*;
 use colored::{Colorize, CustomColor};
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
@@ -30,14 +30,14 @@ impl ScheduleData {
         }
     }
 
-    pub fn update(&mut self, other: &Self) {
-        self.monday = other.monday.clone();
-        self.tuesday = other.tuesday.clone();
-        self.wednesday = other.wednesday.clone();
-        self.thursday = other.thursday.clone();
-        self.friday = other.friday.clone();
-        self.saturday = other.saturday.clone();
-        self.sunday = other.sunday.clone();
+    pub fn update(&mut self, other: Self) {
+        self.monday = other.monday;
+        self.tuesday = other.tuesday;
+        self.wednesday = other.wednesday;
+        self.thursday = other.thursday;
+        self.friday = other.friday;
+        self.saturday = other.saturday;
+        self.sunday = other.sunday;
     }
 
     pub fn get_day(&mut self, day_type: DayType) -> Result<&mut Day, ()> {
@@ -203,10 +203,12 @@ impl ScheduleData {
                     pri.input_pattern.name = pri.input.clone();
                     println!("Remove all the patterns with that name?");
                 }
-            } else {
-                pri.input_pattern.name = pri.args.name.as_ref().unwrap().to_owned();
             }
             pri.args.all = yes_or_no(pri.input.clone());
+        }
+
+        if let Ok(name) = &pri.args.name {
+            pri.input_pattern.name = name.clone();
         }
 
         for day in &valid_days {

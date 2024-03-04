@@ -3,67 +3,52 @@ use crate::time::ScheduleData;
 use file_into_string::*;
 use std::fs::File;
 use std::path::Path;
-use std::sync::RwLock;
 use std::{env, fs};
-use winrt_notification::Toast;
-use windows::ApplicationModel;
+use std::sync::{Mutex,Arc};
 
 use lazy_static::lazy_static;
 lazy_static! {
     static ref DATA_PATH: String = "./data.json".to_string();
-    pub static ref AUMID: RwLock<String> = RwLock::new("".to_string());
 }
 
-pub struct Data {}
+pub struct Data {
+    pub pr:Arc<Mutex<Program>>,
+}
+
+impl Drop for Data {
+    fn drop(&mut self) {
+        self.write();
+    }
+}
 
 impl Data {
-    pub fn get_aumid() {
-        let app_info = ApplicationModel::AppInfo::Current();
-
-        if let Ok(ai) = app_info {
-            let tst = ai.AppUserModelId().unwrap();
-            let str = tst.clone().to_string();
-            let mut unlocked = AUMID.write().unwrap();
-            *unlocked = str;
-        }
-
-        if AUMID.read().unwrap().is_empty() {
-            let mut unlocked = AUMID.write().unwrap();
-            *unlocked = Toast::POWERSHELL_APP_ID.to_string();
-        }
-
-    }
-
-    pub fn read(pr: &mut Program) {
+    pub fn read(&mut self) {
         let exe = env::current_exe().unwrap();
         let dir = exe.parent().expect("Exe must be in some directory");
         println!("Current dir: {}", dir.to_str().unwrap());
 
         println!("Reading...");
-        let path = Path::new(DATA_PATH.as_str());
+        let path =DATA_PATH.as_str();
         let file = File::open(path);
         match file {
             Ok(_) => {}
             Err(_) => {
                 File::create(path).expect("Somehow failed to create the json file lol");
-                Data::write(pr);
+                self.write();
                 return;
             }
         }
         let data = file_into_string(file.unwrap()).unwrap();
-        let value: serde_json::Value =
-            serde_json::from_str(data.as_str()).expect("Couldn't parse the json data.");
-        let e: ScheduleData = serde_json::from_value(value)
-            .expect("Deserialization failed when reading the json file.");
-        pr.data.update(&e);
+        let value: ScheduleData = serde_json::from_str(data.as_str()).expect("Couldn't parse the json data.");
+        self.pr.as_ref().lock().unwrap().data.update(value);
     }
 
-    pub fn write(pr: &Program) {
+    pub fn write(&self) {
         println!("Writing...");
 
         fs::write(
-            Path::new(DATA_PATH.as_str()),
-            serde_json::to_string_pretty(&pr.data).unwrap().as_str(),
+            DATA_PATH.as_str(),
+            serde_json::to_string_pretty(&self.pr.lock().unwrap().data).unwrap(),
         )
         .expect("Write failed");
     }

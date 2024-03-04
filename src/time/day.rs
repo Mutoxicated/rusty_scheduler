@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::time::pattern::Pattern;
-use serde_derive::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
 pub enum DayType {
@@ -96,17 +96,18 @@ impl Day {
     }
 
     pub fn remove_pattern(&mut self, name: String, all: bool) {
-        for i in 0..self.patterns.len() {
-            if self.patterns[i].name == name || name.is_empty() {
-                self.patterns.remove(i);
-                if !all {
-                    return;
-                }
+        if all {
+            if name.is_empty() {
+                self.patterns.clear();
+                return;
             }
+            self.patterns.retain(|x| x.name != name);
+        }else if let Some(i) = self.patterns.iter().position(|x| x.name == name) {
+            self.patterns.remove(i);
         }
     }
 
-    pub fn check_patterns(&mut self, hours:i32,mins:i32) {
+    pub fn check_patterns(&mut self, hours:u64,mins:u64) {
         for i in 0..self.patterns.len() {
             if self.patterns[i].is_ready(hours,mins){
                 self.patterns[i].notify();
