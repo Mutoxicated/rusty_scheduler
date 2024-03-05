@@ -1,12 +1,18 @@
+use chrono::NaiveDateTime;
 use windows::core::PCSTR;
 
 use crate::arg_parser::Args;
 use crate::pst_data::Data;
-use crate::time::day::DayType;
-use crate::time::Pattern;
-use crate::time::ScheduleData;
+use crate::time::{day::DayType,Pattern,PatternInfo,ScheduleData};
 use crate::utils::format_command_name;
 use crate::win::ConsoleWindow;
+
+#[derive(Default)]
+pub struct CommandInfoBuffer {
+    pub input_pattern: PatternInfo,
+    pub all:Option<bool>,
+}
+
 
 pub trait Receive {
     fn receive(&mut self, pr: &mut ProgramInfo);
@@ -15,11 +21,11 @@ pub trait Receive {
 pub struct ProgramInfo {
     pub command_name: String,
     pub args: Args,
-    pub input_pattern: Pattern,
+    pub cmib: CommandInfoBuffer,
     pub pattern_copy_buffer: Option<Pattern>,
     pub command_finished: bool,
     pub input: String,
-    pub steps: i32,
+    pub asked: bool,
     pub today: DayType,
 }
 
@@ -28,19 +34,19 @@ impl ProgramInfo {
         Self {
             args: Args::empty(),
             command_name: String::new(),
-            input_pattern: Pattern::new_empty(),
+            cmib: CommandInfoBuffer::default(),
             pattern_copy_buffer: None,
             command_finished: true,
             input: String::new(),
-            steps: -1,
+            asked: false,
             today: DayType::Na,
         }
     }
 
     pub fn finish(&mut self) {
-        self.steps = -1;
+        self.asked = false;
         self.command_finished = true;
-        self.input_pattern = Pattern::new_empty();
+        self.cmib = CommandInfoBuffer::default();
     }
 }
 
@@ -62,7 +68,7 @@ impl Program {
         command_name == "stop" || command_name == "cancel"
     }
 
-    pub fn receive(&mut self, pri: &mut ProgramInfo, input: &str) {
+    pub fn receive(&mut self, pri: &mut ProgramInfo, input: String) {
         pri.input = input.to_string();
         //println!("Debug: command_finished->{}",pri.command_finished);
 
@@ -78,27 +84,27 @@ impl Program {
         }
 
         let mut parameterless_command: String = input.to_lowercase();
-        let mut parameters:&str = "";
+        let mut parameters:String = "".to_owned();
 
         let index_at_space = parameterless_command.find(' ');
 
         if let Some(i) = index_at_space {
-            parameters = &input[i + 1..input.len()];
+            parameters = input[i + 1..input.len()].to_owned();
             parameterless_command = input[0..i].to_string();
         }
         
         format_command_name(&mut parameterless_command);
 
-        pri.args = Args::get_args(parameters);
+        pri.args = Args::get_args(parameters.as_str());
         pri.command_name = parameterless_command;
         pri.command_finished = false;
 
         self.data.receive(pri);
     }
 
-    pub fn check_patterns(&mut self,hours:u64,mins:u64,dt:DayType){
+    pub fn check_patterns(&mut self,time:NaiveDateTime,dt:DayType){
         let day = self.data.get_day(dt).unwrap();
-        day.check_patterns(hours, mins)
+        day.check_patterns(time)
     }
 
     pub fn exit(&self){

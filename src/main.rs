@@ -6,13 +6,13 @@ mod pst_data;
 mod time;
 mod utils;
 
-use chrono::{Datelike, Local, Timelike};
+use chrono::{DateTime, Datelike, Local, Timelike};
 use colored::{ColoredString, Colorize};
 use global::*;
 use program::{Program, ProgramInfo};
 use pst_data::Data;
 use std::{borrow::BorrowMut, io::stdin, sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
-use time::{day::Day,Time};
+use time::day::Day;
 use utils::*;
 
 use tray_item::{TrayItem,IconSource};
@@ -51,7 +51,7 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
                 }
                 "help" => {
                     help();
-                    input.clear();
+                    input.clone().clear();
                     continue;
                 }
                 "exit" => {
@@ -67,7 +67,7 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
             };
         }
 
-        program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim());
+        program.lock().unwrap().receive(&mut program_info.lock().unwrap(), input.trim().to_owned());
 
         input.clear();
     }
@@ -116,7 +116,7 @@ fn main() {
     program.as_ref().lock().unwrap().data
         .get_day(program_info.as_ref().lock().unwrap().today.clone())
         .unwrap()
-        .present_patterns(true);
+        .present_patterns();
 
     println!("{}help{}","Type '".green(),"' if you're unfamiliar with the commands.".green());
 
@@ -145,24 +145,17 @@ fn main() {
     .unwrap();
 
     thread::spawn(move || {
-        let mut now = Local::now();
-        let hours:u64 = now.hour().into();
-        let mins:u64 = now.minute().into();
-        let secs:u64 = now.second().into();
-        
-        let mut timee:Time = Time::new(hours,mins,secs);
+        let mut now:DateTime<Local>;
 
-        let mut next_minute:u64 = 1;
+        let mut next_minute:u32 = 1;
         loop {
-            sleep(Duration::new(next_minute,0));
+            sleep(Duration::new(next_minute.into(),0));
 
             now = Local::now();
 
-            timee.update(now.hour(),now.minute(),now.second());
-            next_minute = 60-timee.seconds;
-            //println!("{next_minute}");
-            //timee.print();
-            cloned_program.lock().unwrap().check_patterns(timee.hours,timee.minutes,cloned_program_info.lock().unwrap().today.clone());
+            next_minute = 60-now.second();
+            //println!("Debug: {}",now.naive_local());
+            cloned_program.lock().unwrap().check_patterns(now.naive_local(),cloned_program_info.lock().unwrap().today.clone());
         }
     });
 

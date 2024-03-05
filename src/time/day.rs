@@ -1,9 +1,10 @@
 use std::fmt::Display;
 
 use crate::time::pattern::Pattern;
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
-#[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
+#[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub enum DayType {
     Monday,
     Tuesday,
@@ -22,7 +23,7 @@ impl Display for Day {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug)]
 pub struct Day {
     pub day_type: DayType,
     pub patterns: Vec<Pattern>,
@@ -103,20 +104,20 @@ impl Day {
         }
     }
 
-    pub fn check_patterns(&mut self, hours:u64,mins:u64) {
+    pub fn check_patterns(&mut self, time:NaiveDateTime) {
         for i in 0..self.patterns.len() {
-            if self.patterns[i].is_ready(hours,mins){
+            if self.patterns[i].is_ready(time){
                 self.patterns[i].notify();
-                if self.patterns[i].special {
+                if self.patterns[i].once {
                     self.patterns.remove(i);
                 }
             }
         }
     }
 
-    pub fn present_patterns(&self, in_detail: bool) {
+    pub fn present_patterns(&self) {
         for pattern in &self.patterns {
-            pattern.present(in_detail);
+            pattern.present();
         }
     }
 
@@ -124,6 +125,6 @@ impl Day {
         if idx >= self.patterns.len() {
             return None;
         }
-        Some(self.patterns[idx].get_stringified(inner_idx, false))
+        Some(self.patterns[idx].get_stringified(inner_idx))
     }
 }

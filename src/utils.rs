@@ -12,6 +12,8 @@ pub fn help() {
     );
     println!("-You can also add {} to your schedule, which are not recurring and \nwill get removed from the schedule once they happen.\n","Special Events".green());
 
+    println!("{} and {} should be self-explanatory.","Patterns".yellow(),"Special Events".green());
+
     println!("--- COMMANDS ---");
     println!("-today");
     println!("-get_schedule [optional:day(s)]");
@@ -62,25 +64,6 @@ pub fn milli_to_nano(num: u32) -> u32 {
 
 pub fn yes_or_no(string: String) -> bool {
     string.contains('y')
-}
-
-pub fn get_hour(time: &str) -> u64 {
-    let idx = time.find(':');
-    let hour = time.trim()
-        [0..idx.expect("No number was found when getting the hour of the given time string.")]
-        .parse()
-        .expect("Couldn't parse the hour of the given time.");
-    hour
-}
-
-pub fn get_minutes(time: &str) -> u64 {
-    let idx = time.find(':');
-    let minutes = time.trim()[idx
-        .expect("No number was found when getting the minutes of the given time string.")
-        + 1..time.len()]
-        .parse()
-        .expect("Couldn't parse the minutes of the given time.");
-    minutes
 }
 
 fn get_hour_str(time: &str) -> Option<String> {
@@ -180,4 +163,11 @@ pub fn format_command_name(command: &mut String) {
             command.push_str("_pattern");
         }
     }
+}
+
+pub fn limit_to(string:String,limit:usize)->String{
+    if string.len() > limit {
+        return string[0..limit].to_owned();
+    }
+    string
 }

@@ -1,6 +1,6 @@
 use colored::Colorize;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ArgError {
     TimeFormat,
     DayFormat,
@@ -34,7 +34,7 @@ impl std::fmt::Display for ArgError {
 pub struct Args {
     pub name: Result<String, ArgError>,
     pub days: Result<Vec<String>, ArgError>,
-    pub all: bool,
+    pub all: Option<bool>,
 }
 
 impl Args {
@@ -42,77 +42,52 @@ impl Args {
         Self {
             name: Ok(String::new()),
             days: Ok(Vec::new()),
-            all: false,
+            all: None,
         }
     }
 
     pub fn get_args(string: &str) -> Self {
         let mut res_days: Result<Vec<_>, ArgError> = Err(ArgError::DayFormat);
         let mut res_name: Result<String, ArgError> = Err(ArgError::Empty);
+        let mut res_all: Option<bool> = None;
 
-        let mut days: Vec<String> = Vec::new();
         let mut name: String = String::new();
-        let mut all: bool = false;
 
         let mut parameters = string;
 
-        let mut unparsed_days: String;
+        let unparsed_days: & str;
 
-        let (mut array_starts, mut array_ends) = (true, true);
-
-        let mut anchor: &str = " ";
+        let mut anchor: &str = ",";
 
         if parameters.is_empty() {
             return Self {
                 name: res_name,
                 days: Err(ArgError::Empty),
-                all,
+                all:res_all,
             };
         }
 
         let index = parameters.find('[');
         let index2 = parameters.find(']');
 
-        if index.is_none() {
-            array_starts = false;
-        }
-        if index2.is_none() {
-            array_ends = false;
-        }
+        if index.is_some() && index2.is_some() {
+            unparsed_days = &parameters[index.unwrap() + 1..index2.unwrap()];
 
-        if array_starts && array_ends {
-            let mut temp_i: Option<usize>;
-
-            unparsed_days = parameters[index.unwrap() + 1..index2.unwrap()].to_string();
-
-            for _ in 0..7 {
-                temp_i = unparsed_days.find(anchor);
-                //println!("{:?}", temp_i);
-                if temp_i.is_none() {
-                    anchor = ",";
-                    temp_i = unparsed_days.find(anchor);
-                }
-                if temp_i.is_none() {
-                    break;
-                }
-                if 0 == temp_i.unwrap() {
-                    continue;
-                }
-                if unparsed_days[0..temp_i.unwrap() - 1] != *"" {
-                    days.push(unparsed_days[0..temp_i.unwrap()].trim().to_string());
-                }
-
-                unparsed_days.replace_range(0..temp_i.unwrap() + 1, "");
-                unparsed_days = unparsed_days.trim().to_string();
-                //println!("Debug: unparsed days-> {}", unparsed_days);
+            //println!("{:?}", temp_i);
+            if !unparsed_days.contains(anchor) {
+                anchor = " ";
             }
 
-            if !unparsed_days.is_empty() {
-                days.push(unparsed_days.clone());
+            let days:Vec<&str> = unparsed_days.split(anchor.chars().nth(0).unwrap()).collect();
+
+            let mut days_string:Vec<String> = Vec::new();
+
+            for day in &days{
+                days_string.push(day.trim().to_owned());
             }
-            
-            let mut temp_str = parameters.to_string();
-            temp_str.replace_range(index.unwrap()..index2.unwrap() + 1, "");
+
+            let mut temp_str:String = parameters.to_string();
+            temp_str.replace_range(index.unwrap()..index2.unwrap()+1, "");
 
             parameters = temp_str.trim();
             //at this point, the whole days array is removed from parameters and
@@ -124,23 +99,23 @@ impl Args {
                 end_name = Some(parameters.len());
             } else {
                 let all_string = &parameters[end_name.unwrap()..parameters.len()];
-                all = all_string.contains("all");
+                res_all = Some(all_string.contains("all"));
             }
 
-            if !days.is_empty() {
-                res_days = Ok(days);
+            if !days_string.is_empty() {
+                res_days = Ok(days_string);
             } else {
                 res_days = Err(ArgError::Empty);
             }
 
             //name
             name = parameters[0..end_name.unwrap()].trim().to_string();
-        } else if !array_starts && !array_ends {
+        } else if index.is_none() && index2.is_none() {
             name = parameters.trim().to_string();
         }
 
         if name == "all"{
-            all = true;
+            res_all = Some(true);
             name = "".to_owned();
         }
 
@@ -151,10 +126,10 @@ impl Args {
         let res = Self {
             name: res_name,
             days: res_days,
-            all,
+            all:res_all,
         };
 
-        //println!("{res:?}");
+        println!("{res:?}");
 
         res
     }

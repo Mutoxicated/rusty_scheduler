@@ -1,8 +1,12 @@
+use std::str::FromStr;
+
 use crate::arg_parser::ArgError;
 use crate::global::*;
 use crate::program::{ProgramInfo, Receive};
 use crate::time::day::{Day, DayType};
+use crate::time::Pattern;
 use crate::utils::*;
+use chrono::{Local, NaiveDateTime, NaiveTime};
 use colored::{Colorize, CustomColor};
 use serde::{Deserialize, Serialize};
 
@@ -76,6 +80,41 @@ impl ScheduleData {
         }
     }
 
+    fn assign_valid_arguments(pri: &mut ProgramInfo){
+        if let Ok(name) = &pri.args.name {
+            pri.cmib.input_pattern.name = Some(name.clone());
+        }
+        if pri.args.all.is_some() {
+            pri.cmib.all = pri.args.all;
+        }
+    }
+
+    fn get_daytypes(pri:&mut ProgramInfo,valid_days:&mut Vec<DayType>) -> Option<ArgError>{
+        if let Err(er) = &pri.args.days {
+            if pri.args.all.is_none() || !pri.args.all.unwrap() {
+                return Some(er.clone())
+            }else {
+                *valid_days = vec![
+                    DayType::Monday,
+                    DayType::Tuesday,
+                    DayType::Wednesday,
+                    DayType::Thursday,
+                    DayType::Friday,
+                    DayType::Saturday,
+                    DayType::Sunday,
+                ];
+            }
+            None
+        }else {
+            ScheduleData::get_valid_days(valid_days, pri.args.days.as_ref().unwrap());
+            if valid_days.is_empty() {
+                Some(ArgError::InvalidDay)
+            }else {
+                None
+            }
+        }
+    }
+
     fn copy_pattern(&mut self, pri: &mut ProgramInfo){
         let dayt:DayType;
         if let Err(er) = &pri.args.days {
@@ -90,19 +129,17 @@ impl ScheduleData {
             dayt = Day::from_string(pri.args.days.as_ref().unwrap()[0].as_str());
         }
 
-        pri.steps += 1;
+        ScheduleData::assign_valid_arguments(pri);
 
-        let mut name:&str = "";
-
-        if pri.args.days.is_err() {
-            if pri.steps == 0{
+        if pri.cmib.input_pattern.name.is_none() {
+            if !pri.asked {
+                pri.asked = true;
                 println!("Please provide the name of the pattern.");
                 return;
-            }else if pri.steps == 1 {
-                name = pri.input.as_str();
+            }else {
+                pri.cmib.input_pattern.name = Some(pri.input.clone());
+                pri.asked = false;
             }
-        }else {
-            name = pri.args.name.as_ref().unwrap();
         }
 
         if dayt == DayType::Na {
@@ -113,11 +150,11 @@ impl ScheduleData {
 
         let day = self.get_day(dayt.clone()).unwrap();
 
-        if !day.pattern_exists(name){
+        if !day.pattern_exists(pri.cmib.input_pattern.name.as_ref().unwrap().as_str()){
             println!("{}",ArgError::InvalidPatternName);
         }else {
-            println!("Copied {} '{}' from {dayt:?}!","Pattern".yellow(),name);
-            pri.pattern_copy_buffer = Some(day.copy_pattern(name).unwrap());
+            println!("Copied {} '{}' from {dayt:?}!","Pattern".yellow(),pri.cmib.input_pattern.name.as_ref().unwrap());
+            pri.pattern_copy_buffer = Some(day.copy_pattern(pri.cmib.input_pattern.name.as_ref().unwrap().as_str()).unwrap());
         }
         pri.finish();
     }
@@ -131,28 +168,18 @@ impl ScheduleData {
         let mut valid_days: Vec<DayType> = Vec::new();
 
         if let Ok(name) = &pri.args.name {
-            valid_days = vec![
-                Day::from_string(name.as_str())
-            ];
-        }else {
-            if let Err(er) = &pri.args.days {
-                println!("{er}");
-                pri.finish();
-                return;
-            }
-            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
-        }
-
-        if valid_days.is_empty() || valid_days[0] == DayType::Na {
-            println!("{}",ArgError::InvalidDay);
+            valid_days.push(Day::from_string(name));
+        }else if let Some(er) = ScheduleData::get_daytypes(pri, &mut valid_days) {
+            println!("{er}");
             pri.finish();
             return;
         }
 
         for vd in &valid_days {
-            let day = self.get_day(vd.clone()).unwrap();
-
-            day.add_pattern(pri.pattern_copy_buffer.as_ref().unwrap().clone());
+            let day = self.get_day(vd.clone());
+            if let Ok(d) = day {
+                d.add_pattern(pri.pattern_copy_buffer.as_ref().unwrap().clone());
+            }
         }
         println!("Pasted {} '{}' onto {:?}!","Pattern".yellow(),pri.pattern_copy_buffer.as_ref().unwrap().name,valid_days);
         pri.pattern_copy_buffer = None;
@@ -160,64 +187,49 @@ impl ScheduleData {
     }
 
     fn remove_pattern(&mut self, pri: &mut ProgramInfo) {
+        //evaluation
         let mut valid_days: Vec<DayType> = Vec::new();
-        if let Err(er) = &pri.args.days {
-            if !pri.args.all {
-                println!("{er}");
+
+        if let Some(er) = ScheduleData::get_daytypes(pri,&mut valid_days) {
+            println!("{er}");
+            pri.finish();
+            return;
+        }
+
+        ScheduleData::assign_valid_arguments(pri);
+
+        if pri.cmib.input_pattern.name.is_none() && pri.cmib.all.is_none() {
+            if !pri.asked {
+                pri.asked = true;
+                println!("Please provide the name of the {}", "pattern".yellow());
+                return;
+            }else if pri.input.is_empty() {
+                println!("{}", ArgError::Empty);
                 pri.finish();
                 return;
             }else {
-                valid_days = vec![
-                    DayType::Monday,
-                    DayType::Tuesday,
-                    DayType::Wednesday,
-                    DayType::Thursday,
-                    DayType::Friday,
-                    DayType::Saturday,
-                    DayType::Sunday,
-                ];
+                pri.cmib.input_pattern.name = Some(pri.input.clone());
+                pri.asked = false;
             }
-        }else {
-            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
         }
 
-        pri.steps += 1;
+        //execution
 
-        if valid_days.is_empty() {
-            println!("{}",ArgError::InvalidDay);
-            pri.finish();
-            return;
+        if pri.cmib.all.is_none() {
+            pri.cmib.all = Some(false);
         }
 
-        if pri.input.is_empty() && pri.steps == 1 {
-            println!("{}", ArgError::Empty);
-            pri.finish();
-            return;
-        }
-        if !pri.args.all {
-            if pri.args.name.is_err() {
-                if pri.steps == 0 {
-                    println!("Please provide the name of the {}", "pattern".yellow());
-                    return;
-                } else if pri.steps == 1 {
-                    pri.input_pattern.name = pri.input.clone();
-                    println!("Remove all the patterns with that name?");
-                }
-            }
-            pri.args.all = yes_or_no(pri.input.clone());
-        }
-
-        if let Ok(name) = &pri.args.name {
-            pri.input_pattern.name = name.clone();
+        if pri.cmib.input_pattern.name.is_none() {
+            pri.cmib.input_pattern.name = Some("".to_owned());
         }
 
         for day in &valid_days {
             self.get_day(day.clone())
                 .unwrap()
-                .remove_pattern(pri.input_pattern.name.clone(), pri.args.all);
+                .remove_pattern(pri.cmib.input_pattern.name.as_ref().unwrap().clone(), pri.args.all.unwrap());
         }
 
-        if pri.input_pattern.name.is_empty() {
+        if pri.cmib.input_pattern.name.as_ref().unwrap().is_empty() {
             println!(
                 "All {} removed from {valid_days:?}!",
                 "Patterns".yellow()
@@ -226,91 +238,78 @@ impl ScheduleData {
             println!(
                 "{} '{}' removed from {valid_days:?}!",
                 "Pattern".yellow(),
-                pri.input_pattern.name
+                pri.cmib.input_pattern.name.as_ref().unwrap()
             );
         }
         pri.finish();
     }
 
     fn add_pattern(&mut self, pri: &mut ProgramInfo) {
-        if let Err(er) = &pri.args.days {
-            if pri.args.name.is_err() {
-                println!("{er}");
-                pri.finish();
-                return;
-            }
-        }
+        //evaluation
         let mut valid_days: Vec<DayType> = Vec::new();
-        if let Ok(dayt) = &pri.args.name {
-            valid_days.push(Day::from_string(dayt));
-            if valid_days[0] == DayType::Na {
-                println!("{}",ArgError::InvalidDay);
-                pri.finish();
-                return;
-            }
-        } else {
-            ScheduleData::get_valid_days(&mut valid_days, pri.args.days.as_ref().unwrap());
-        }
-
-        if valid_days.is_empty() {
-            println!("{}", ArgError::DayFormat);
+        if let Some(er) = ScheduleData::get_daytypes(pri, &mut valid_days) {
+            println!("{er}");
             pri.finish();
             return;
         }
 
-        pri.steps += 1;
-        if pri.steps == 4 {
-            pri.input_pattern.desc = pri.input.clone();
-        }
-        if pri.steps == 3 {
-            let formatted_time = format_time(pri.input.as_str());
-            if let Err(x) = formatted_time {
-                println!("{x}");
-                pri.finish();
+        ScheduleData::assign_valid_arguments(pri);
+
+        if pri.cmib.input_pattern.once.is_none() {
+            if !pri.asked {
+                pri.asked = true;
+                println!("Is the event a special event?");
                 return;
+            }else {
+                pri.asked = false;
+                pri.cmib.input_pattern.once = Some(yes_or_no(pri.input.clone()));
             }
-            let fmt_time_str = formatted_time.as_ref().unwrap().as_str();
-            pri.input_pattern.change_time(get_hour(fmt_time_str),get_minutes(fmt_time_str));
-            println!(
-                "Please provide a description. {}",
-                "(and keep it short!)".custom_color(*GREY)
-            );
-            return;
         }
-        if pri.steps == 2 {
-            if pri.input.is_empty() {
-                println!("{}", ArgError::Empty);
-                pri.finish();
+        if pri.cmib.input_pattern.name.is_none() {
+            if !pri.asked {
+                pri.asked = true;
+                println!("Please provide the name of the pattern.");
                 return;
+            }else {
+                pri.asked = false;
+                pri.cmib.input_pattern.name = Some(pri.input.clone());
             }
-            pri.input_pattern.name = pri.input.clone();
-            println!(
-                "What time? {}",
-                "(please use the 24 hour format)".custom_color(*GREY)
-            );
-            return;
         }
-        if pri.steps == 1 {
-            pri.input_pattern.special = yes_or_no(pri.input.clone());
-            println!("What is the name of the pattern?");
-            return;
+        if pri.cmib.input_pattern.date_time.is_none() {
+            if !pri.asked {
+                pri.asked = true;
+                println!(
+                    "What time? {}",
+                    "(please use the 24 hour format)".custom_color(*GREY)
+                );
+                return;
+            }else {
+                pri.asked = false;
+                let formatted_time = format_time(pri.input.as_str());
+                if let Err(x) = formatted_time {
+                    println!("{x}");
+                    pri.finish();
+                    return;
+                }
+                let fmt_time_str = formatted_time.as_ref().unwrap().as_str();
+                let now = Local::now();
+
+                pri.cmib.input_pattern.date_time = Some(NaiveDateTime::new(now.date_naive(),NaiveTime::from_str(fmt_time_str).unwrap()));
+            }
         }
-        if pri.steps == 0 {
-            pri.command_finished = false;
-            println!("Is the event a special event?");
-            return;
-        }
+
+        //execution
 
         for valid_day in &valid_days {
             self.get_day(valid_day.clone())
                 .unwrap()
-                .add_pattern(pri.input_pattern.clone());
+                .add_pattern(Pattern::try_from(pri.cmib.input_pattern.clone()).unwrap());
         }
 
         println!(
             "{} '{}' added to {:?}!",
             "Pattern".yellow(),
-            pri.input_pattern.name,
+            pri.cmib.input_pattern.name.as_ref().unwrap(),
             valid_days
         );
         pri.finish();
@@ -319,7 +318,7 @@ impl ScheduleData {
     fn today(&mut self, pri: &mut ProgramInfo) {
         let day = self.get_day(pri.today.to_owned()).unwrap();
         println!("{:?}", pri.today);
-        day.present_patterns(true);
+        day.present_patterns();
         pri.finish();
     }
 
@@ -361,7 +360,7 @@ impl ScheduleData {
         pri.finish();
     }
 
-    fn present_schedule(&mut self, days: Vec<DayType>) {//TODO: Fix problem with long descriptions
+    fn present_schedule(&mut self, days: Vec<DayType>) {
         let mut day_indices: Vec<usize> = Vec::new();
         let mut actual_days: Vec<&Day> = Vec::new();
         for day in &days {
