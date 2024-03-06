@@ -1,7 +1,13 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "no",
+        "date_time": "2024-03-06T18:34:00",
+        "once": false
+      }
+    ]
   },
   "tuesday": {
     "day_type": "Tuesday",
@@ -9,7 +15,13 @@
   },
   "wednesday": {
     "day_type": "Wednesday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "asd",
+        "date_time": "2024-03-06T18:37:00",
+        "once": false
+      }
+    ]
   },
   "thursday": {
     "day_type": "Thursday",

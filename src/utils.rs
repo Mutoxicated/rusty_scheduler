@@ -22,8 +22,8 @@ pub fn help() {
     println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
     println!("-copy_pattern [day] <name>");
     println!("-paste_pattern [day(s)]");
-    println!("-find_pattern <optional:name> {}\n","(not yet added)".custom_color(*GREY));
-    println!("-clear <optional:days, alternative:all>");
+    println!("-find_pattern <optional:name> {}","(not yet added)".custom_color(*GREY));
+    println!("-clear <optional:days, alternative:all>\n");
 
     println!("{} add_pattern [Monday,Tuesday]","Example:".bright_blue());
     println!("{} copy_pattern [Sunday] Basketball\n","Example:".bright_blue());

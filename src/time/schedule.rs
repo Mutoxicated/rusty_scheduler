@@ -163,11 +163,11 @@ impl ScheduleData {
         if let Some(er) = ScheduleData::get_daytypes(pri){
             if !ScheduleData::name_to_day(pri) {
                 ScheduleData::name_to_all(pri);
-            }
-            if let Some(er2) = ScheduleData::get_daytypes(pri) {
-                println!("{er2}");
-                pri.finish();
-                return true;
+                if let Some(er2) = ScheduleData::get_daytypes(pri) {
+                    println!("{er2}");
+                    pri.finish();
+                    return true;
+                }
             }
             if pri.cmib.valid_daytypes.as_ref().unwrap().is_empty() {
                 println!("{er}");
@@ -325,7 +325,7 @@ impl ScheduleData {
             }
         }
         if pri.cmib.input_pattern.date_time.is_none() {
-            println!("Debug: asked->{}",pri.asked);
+            //println!("Debug: asked->{}",pri.asked);
             if !pri.asked {
                 pri.asked = true;
                 println!(

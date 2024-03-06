@@ -110,7 +110,7 @@ fn main() {
 
     println!("Today is {:?} and the time is {time}.", program_info.as_ref().lock().unwrap().today);
     sleep(Duration::new(0, milli_to_nano(250)));
-    println!("Here is uour schedule for today:");
+    println!("Here is your schedule for today:");
     sleep(Duration::new(0, milli_to_nano(250)));
     println!("{:?}", program_info.as_ref().lock().unwrap().today);
     program.as_ref().lock().unwrap().data
