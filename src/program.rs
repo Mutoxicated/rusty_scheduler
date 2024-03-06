@@ -11,6 +11,7 @@ use crate::win::ConsoleWindow;
 pub struct CommandInfoBuffer {
     pub input_pattern: PatternInfo,
     pub all:Option<bool>,
+    pub valid_daytypes:Option<Vec<DayType>>,
 }
 
 

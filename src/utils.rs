@@ -16,13 +16,14 @@ pub fn help() {
 
     println!("--- COMMANDS ---");
     println!("-today");
-    println!("-get_schedule [optional:day(s)]");
+    println!("-get_schedule [optional:day(s),alternative:all]");
     println!("-add_pattern [day(s)]");
     println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
     println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
     println!("-copy_pattern [day] <name>");
     println!("-paste_pattern [day(s)]");
     println!("-find_pattern <optional:name> {}\n","(not yet added)".custom_color(*GREY));
+    println!("-clear <optional:days, alternative:all>");
 
     println!("{} add_pattern [Monday,Tuesday]","Example:".bright_blue());
     println!("{} copy_pattern [Sunday] Basketball\n","Example:".bright_blue());
@@ -152,7 +153,7 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
 }
 
 pub fn format_command_name(command: &mut String) {
-    if command == "today" {
+    if command == "today" || command == "clear" {
         return;
     }
     //println!("{command}");

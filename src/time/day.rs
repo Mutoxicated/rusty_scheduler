@@ -104,6 +104,10 @@ impl Day {
         }
     }
 
+    pub fn clear(&mut self){
+        self.patterns.clear();
+    }
+
     pub fn check_patterns(&mut self, time:NaiveDateTime) {
         for i in 0..self.patterns.len() {
             if self.patterns[i].is_ready(time){

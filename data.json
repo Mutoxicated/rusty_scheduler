@@ -1,127 +1,30 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": [
-      {
-        "name": "asdxc",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "asd",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "tuesday": {
     "day_type": "Tuesday",
-    "patterns": [
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "wqeredgf",
-        "date_time": "2024-03-05T17:54:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "wednesday": {
     "day_type": "Wednesday",
-    "patterns": [
-      {
-        "name": "asd",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "thursday": {
     "day_type": "Thursday",
-    "patterns": [
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": [
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "saturday": {
     "day_type": "Saturday",
-    "patterns": [
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "sunday": {
     "day_type": "Sunday",
-    "patterns": [
-      {
-        "name": "we",
-        "date_time": "2024-03-05T12:00:00",
-        "once": false
-      },
-      {
-        "name": "",
-        "date_time": "+262142-12-31T23:59:59.999999999",
-        "once": false
-      }
-    ]
+    "patterns": []
   }
 }

@@ -114,11 +114,6 @@ impl Args {
             name = parameters.trim().to_string();
         }
 
-        if name == "all"{
-            res_all = Some(true);
-            name = "".to_owned();
-        }
-
         if !name.is_empty() {
             res_name = Ok(name);
         }
@@ -129,7 +124,7 @@ impl Args {
             all:res_all,
         };
 
-        println!("{res:?}");
+        //println!("{res:?}");
 
         res
     }
