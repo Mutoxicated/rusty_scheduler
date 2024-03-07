@@ -17,7 +17,7 @@ pub fn help() {
     println!("--- COMMANDS ---");
     println!("-today");
     println!("-get_schedule [optional:day(s),alternative:all]");
-    println!("-add_pattern [day(s)]");
+    println!("-add_pattern [day(s)] <optional:name>");
     println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
     println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
     println!("-copy_pattern [day] <name>");

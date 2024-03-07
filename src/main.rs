@@ -48,6 +48,9 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
                 }
                 "hide" => {
                     program.as_ref().lock().unwrap().console.hide();
+                },
+                "full" => {
+                    program.as_ref().lock().unwrap().console.show_full();
                 }
                 "help" => {
                     help();
@@ -124,10 +127,18 @@ fn main() {
     let cloned_program2 = Arc::clone(&program);
     let cloned_program3 = Arc::clone(&program);
     let cloned_program4 = Arc::clone(&program);
+    let cloned_program5 = Arc::clone(&program);
     let cloned_program_info = Arc::clone(&program_info);
 
     //Setup System Tray
     let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("rusty_sched")).unwrap();
+
+    tray.add_menu_item("About", move || {
+        cloned_program5.as_ref().lock().unwrap().console.about();
+    })
+    .unwrap();
+
+    tray.inner_mut().add_separator().unwrap();
 
     tray.add_menu_item("Open", move || {
         cloned_program2.as_ref().lock().unwrap().console.show();

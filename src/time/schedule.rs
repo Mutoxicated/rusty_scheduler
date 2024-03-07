@@ -203,7 +203,7 @@ impl ScheduleData {
         }
         //execution
         let day = self.get_day(dayt.clone()).unwrap();
-
+        pri.cmib.input_pattern.name = Some(limit_to(pri.cmib.input_pattern.name.as_ref().unwrap().clone(),*NAME_LIMIT));
         if !day.pattern_exists(pri.cmib.input_pattern.name.as_ref().unwrap().as_str()){
             println!("{}",ArgError::InvalidPatternName);
         }else {
@@ -272,6 +272,7 @@ impl ScheduleData {
             pri.cmib.input_pattern.name = Some("".to_owned());
         }
 
+        pri.cmib.input_pattern.name = Some(limit_to(pri.cmib.input_pattern.name.as_ref().unwrap().clone(),*NAME_LIMIT));
         for day in pri.cmib.valid_daytypes.as_ref().unwrap() {
             self.get_day(day.clone())
                 .unwrap()
@@ -349,7 +350,7 @@ impl ScheduleData {
         }
 
         //execution
-
+        pri.cmib.input_pattern.name = Some(limit_to(pri.cmib.input_pattern.name.as_ref().unwrap().clone(),*NAME_LIMIT));
         for valid_day in pri.cmib.valid_daytypes.as_ref().unwrap() {
             self.get_day(valid_day.clone())
                 .unwrap()

@@ -83,7 +83,7 @@ impl Pattern {
     }
 
     pub fn present(&self) {
-        println!("| {}",limit_to(self.date_time.time().to_string(),5).blue());
+        println!("= {}",limit_to(self.date_time.time().to_string(),5).blue());
         let colored_name: ColoredString = if self.once {
             self.name.green()
         } else {
@@ -98,6 +98,5 @@ impl Pattern {
         }else {
             format!("- {}", self.name)
         }
-       
     }
 }
