@@ -1,13 +1,11 @@
 use std::thread::sleep;
 use std::time::Duration;
 
-use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+use windows::Win32::Foundation::HWND;
 use windows::Win32::System::Console::SetConsoleTitleA;
-use windows::Win32::UI::Shell::{ShellExecuteA, ShellExecuteW};
-use windows::Win32::UI::WindowsAndMessaging::{DefWindowProcA, FindWindowA, ShowWindow, SW_HIDE, SW_MAXIMIZE, SW_MINIMIZE, SW_SHOWDEFAULT, SW_SHOWNORMAL, WM_QUIT};
+use windows::Win32::UI::Shell::ShellExecuteA;
+use windows::Win32::UI::WindowsAndMessaging::{FindWindowA, ShowWindow, SW_HIDE, SW_MAXIMIZE, SW_MINIMIZE, SW_SHOWDEFAULT, SW_SHOWNORMAL};
 use windows::core::PCSTR;
-
-use crate::pst_data::Data;
 
 unsafe impl Send for ConsoleWindow{}
 unsafe impl Sync for ConsoleWindow{}

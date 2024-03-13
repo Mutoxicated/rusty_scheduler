@@ -9,13 +9,7 @@
   },
   "wednesday": {
     "day_type": "Wednesday",
-    "patterns": [
-      {
-        "name": "asd",
-        "date_time": "2024-03-06T18:37:00",
-        "once": false
-      }
-    ]
+    "patterns": []
   },
   "thursday": {
     "day_type": "Thursday",

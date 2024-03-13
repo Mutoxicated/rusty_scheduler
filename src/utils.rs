@@ -16,27 +16,29 @@ pub fn help() {
 
     println!("--- COMMANDS ---");
     println!("-today");
-    println!("-get_schedule [optional:day(s),alternative:all]");
+    println!("-get_schedule <optional:day(s),alternative:all>");
     println!("-add_pattern [day(s)] <optional:name>");
     println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
     println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
     println!("-copy_pattern [day] <name>");
     println!("-paste_pattern [day(s)]");
-    println!("-find_pattern <optional:name> {}","(not yet added)".custom_color(*GREY));
+    //println!("-find_pattern <optional:name> {}","(not yet added)".custom_color(*GREY));
     println!("-clear <optional:days, alternative:all>\n");
 
     println!("{} add_pattern [Monday,Tuesday]","Example:".bright_blue());
     println!("{} copy_pattern [Sunday] Basketball\n","Example:".bright_blue());
 
-    println!("{} You also can abbreviate the days down to the three first letters! Commands can also be abbreviated.\n","Tip:".green());
+    println!("{} You also can abbreviate the days down to the first three letters! Commands can also be abbreviated.\n","Tip:".green());
 
     println!("{} add [mon,tue]","Example:".bright_blue());
     println!("{} copy [sun] Basketball\n","Example:".bright_blue());
 
     println!(
         "{}",
-        "(note: in the <all> parameter, you either put nothing or the word 'all')".custom_color(*GREY)
+        "(note 1: in the <all> parameter, you either put nothing or the word 'all')".custom_color(*GREY)
     );
+    println!("{}","(note 2: in change_pattern, you can put the word 'copy' to change the current copied pattern.)".custom_color(*GREY));
+
 }
 
 pub fn process_time(time: &str) -> (String,String) {

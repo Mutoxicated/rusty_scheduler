@@ -4,6 +4,12 @@ use crate::time::pattern::Pattern;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
+#[derive(PartialEq,Eq,Clone)]
+pub enum PatternDetectionType {
+    All,
+    Nth(usize)
+}
+
 #[derive(std::fmt::Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub enum DayType {
     Monday,
@@ -92,15 +98,34 @@ impl Day {
         self.patterns.sort();
     }
 
-    pub fn remove_pattern(&mut self, name: String, all: bool) {
-        if all {
+    pub fn remove_pattern(&mut self, name: String, pdt: PatternDetectionType) {
+        if pdt == PatternDetectionType::All {
             if name.is_empty() {
                 self.patterns.clear();
                 return;
             }
             self.patterns.retain(|x| x.name != name);
-        }else if let Some(i) = self.patterns.iter().position(|x| x.name == name) {
-            self.patterns.remove(i);
+        }else {
+            let mut ui = 0;
+            let mut occurences = 0;
+            for i in 0..self.patterns.len() {
+                if self.patterns[i].name == name {
+                    occurences += 1;
+                    ui = i;
+                    if let PatternDetectionType::Nth(x) = pdt {
+                        if x == occurences {
+                            self.patterns.remove(ui);
+                            return;
+                        }
+                    }
+                }
+            }
+            if let PatternDetectionType::Nth(x) = pdt {
+                if occurences >= x {
+                    return;
+                }
+                self.patterns.remove(ui);
+            }
         }
     }
 

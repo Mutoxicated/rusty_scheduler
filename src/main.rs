@@ -51,12 +51,15 @@ fn body(logo_lines:&[ColoredString] ,program:&Arc<Mutex<Program>>,program_info:&
                 },
                 "full" => {
                     program.as_ref().lock().unwrap().console.show_full();
-                }
+                },
+                "about" => {
+                    program.as_ref().lock().unwrap().console.about();
+                },
                 "help" => {
                     help();
-                    input.clone().clear();
+                    input.clear();
                     continue;
-                }
+                },
                 "exit" => {
                     println!("{}", "|".custom_color(*GREY));
                     println!("Exiting...");

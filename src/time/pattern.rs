@@ -94,7 +94,7 @@ impl Pattern {
 
     pub fn get_stringified(&self, idx: usize) -> String {
         if idx == 0 {
-            format!(" {}",limit_to(self.date_time.time().to_string(),5))
+            format!("= {}",limit_to(self.date_time.time().to_string(),5))
         }else {
             format!("- {}", self.name)
         }

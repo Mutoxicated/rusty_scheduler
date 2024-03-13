@@ -3,15 +3,16 @@ use windows::core::PCSTR;
 
 use crate::arg_parser::Args;
 use crate::pst_data::Data;
-use crate::time::{day::DayType,Pattern,PatternInfo,ScheduleData};
+use crate::time::{day::DayType,Pattern,day::PatternDetectionType,PatternInfo,ScheduleData};
 use crate::utils::format_command_name;
 use crate::win::ConsoleWindow;
 
 #[derive(Default)]
 pub struct CommandInfoBuffer {
     pub input_pattern: PatternInfo,
-    pub all:Option<bool>,
+    pub all:Option<PatternDetectionType>,
     pub valid_daytypes:Option<Vec<DayType>>,
+    pub index:Option<usize>,
 }
 
 

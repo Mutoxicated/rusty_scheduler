@@ -10,6 +10,8 @@ use chrono::{Local, NaiveDateTime, NaiveTime};
 use colored::{Colorize, CustomColor};
 use serde::{Deserialize, Serialize};
 
+use super::day::PatternDetectionType;
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct ScheduleData {
     pub monday: Day,
@@ -98,8 +100,8 @@ impl ScheduleData {
         if let Ok(name) = &pri.args.name {
             pri.cmib.input_pattern.name = Some(name.clone());
         }
-        if pri.args.all.is_some() {
-            pri.cmib.all = pri.args.all;
+        if pri.args.all.is_some() && pri.args.all.unwrap() {
+            pri.cmib.all = Some(PatternDetectionType::All);
         }
         if pri.cmib.valid_daytypes.is_none() {
             if pri.args.days.is_ok() {
@@ -112,7 +114,7 @@ impl ScheduleData {
 
     fn get_daytypes(pri:&mut ProgramInfo) -> Option<ArgError>{
         if let Err(er) = &pri.args.days {
-            if pri.cmib.all.is_none() || !pri.cmib.all.unwrap() {
+            if pri.cmib.all.is_none() {
                 return Some(er.clone())
             }else {
                 pri.cmib.valid_daytypes = Some(vec![
@@ -154,9 +156,12 @@ impl ScheduleData {
             return false;
         }
 
-        pri.cmib.all = Some(pri.cmib.input_pattern.name.as_ref().unwrap().contains("all"));
-        pri.cmib.input_pattern.name = None;
-        true
+        if pri.cmib.input_pattern.name.as_ref().unwrap().contains("all") {
+            pri.cmib.all = Some(PatternDetectionType::All);
+            pri.cmib.input_pattern.name = None;
+            return true;
+        }
+        false
     }
 
     fn flexible_get_daytypes(pri: &mut ProgramInfo)->bool {//return failure
@@ -262,10 +267,23 @@ impl ScheduleData {
             }
         }
 
+        if pri.cmib.index.is_none() {
+            if !pri.asked {
+                pri.asked = true;
+                println!("Please provide {}, where {} is the {}th pattern with that name.","X".blue(),"X".blue(),"X".blue());
+                return;
+            }else {
+                pri.asked = false;
+                pri.cmib.index = Some(pri.input.parse().unwrap());
+            }
+        }
+
         //execution
 
         if pri.cmib.all.is_none() {
-            pri.cmib.all = Some(false);
+            pri.cmib.all = Some(PatternDetectionType::Nth(pri.cmib.index.unwrap()));
+        }else {
+            pri.cmib.all = Some(PatternDetectionType::All);
         }
 
         if pri.cmib.input_pattern.name.is_none() {
@@ -276,7 +294,7 @@ impl ScheduleData {
         for day in pri.cmib.valid_daytypes.as_ref().unwrap() {
             self.get_day(day.clone())
                 .unwrap()
-                .remove_pattern(pri.cmib.input_pattern.name.as_ref().unwrap().clone(), pri.cmib.all.unwrap());
+                .remove_pattern(pri.cmib.input_pattern.name.as_ref().unwrap().clone(), pri.cmib.all.as_ref().unwrap().clone());
         }
 
         if pri.cmib.input_pattern.name.as_ref().unwrap().is_empty() {
