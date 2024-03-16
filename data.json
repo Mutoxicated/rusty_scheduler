@@ -21,7 +21,14 @@
   },
   "saturday": {
     "day_type": "Saturday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "o",
+        "date_time": "2024-03-16T20:00:00",
+        "once": false,
+        "mandatory": false
+      }
+    ]
   },
   "sunday": {
     "day_type": "Sunday",

@@ -19,7 +19,7 @@ pub fn help() {
     println!("-get_schedule <optional:day(s),alternative:all>");
     println!("-add_pattern [day(s)] <optional:name>");
     println!("-remove_pattern [day(s)] <optional:name> <optional:all>");
-    println!("-change_pattern [day(s)] <optional:name> {}","(not yet added)".custom_color(*GREY));
+    println!("-change_pattern [day(s)] <optional:name> <optional:all>");
     println!("-copy_pattern [day] <name>");
     println!("-paste_pattern [day(s)]");
     //println!("-find_pattern <optional:name> {}","(not yet added)".custom_color(*GREY));
@@ -92,10 +92,10 @@ fn get_minutes_str(time: &str) -> Option<String> {
 pub fn format_time(time: &str) -> Result<String, ArgError> {
     let mut formatted_time: String = String::from(time);
 
-    let hour = get_hour_str(time);
-    let minutes: Option<String> = get_minutes_str(time);
-
     if formatted_time.len() == 1 {
+        if !formatted_time.chars().nth(0).unwrap().is_ascii_digit(){
+            return Err(ArgError::TimeFormat);
+        }
         let mut full_str:String = "0".to_string();
         full_str.push_str(formatted_time.as_str());
         formatted_time = full_str;
@@ -103,7 +103,11 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
     }
 
     if formatted_time.len() == 2 {
-        let res: Result<i32, _> = time.parse();
+        let prcsed_str = process_str_num(&formatted_time);
+        if prcsed_str.is_none() {
+            return Err(ArgError::TimeFormat);
+        }
+        let res: Result<i32, _> = formatted_time.parse();
         if let Ok(mut num) = res {
             if num > 23 {
                 num = 24;
@@ -114,41 +118,27 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
         }
     }
 
-    if hour.is_none() {
-        return Err(ArgError::TimeFormat);
-    }
+    let hour = process_str_num(&get_hour_str(&formatted_time).unwrap_or("".to_owned()));
+    let minutes = process_str_num(&get_minutes_str(&formatted_time).unwrap_or("".to_owned()));
+
     if let Some(ref str) = hour {
         if str.is_empty() {
             return Err(ArgError::TimeFormat);
         }
+    }else {
+        return Err(ArgError::TimeFormat);
     }
     if let Some(ref str) = minutes {
         if str.is_empty() {
             return Err(ArgError::TimeFormat);
         }
-    }
-
-    let hour_res: Result<String, _> = hour.unwrap().parse();
-
-    if hour_res.is_err() {
-        return Err(ArgError::TimeFormat);
-    }
-    let minutes_res: Result<String, _> = minutes.unwrap().parse();
-    if minutes_res.is_err() {
+    }else {
         return Err(ArgError::TimeFormat);
     }
 
-    if minutes_res.unwrap().len() == 1 && time.len() > 2 {
-        formatted_time.insert(3, '0');
-        return Ok(formatted_time);
-    }
-
-    let minutes: i32 = formatted_time[3..5].parse().unwrap();
-
-    //println!("{minutes}");
-
+    let minutes: i32 = minutes.unwrap().parse().unwrap();
     if minutes > 59 {
-        formatted_time.replace_range(3..5, "59");
+        formatted_time.replace_range(formatted_time.find(':').unwrap()+1..formatted_time.len(), "59");
     }
 
     Ok(formatted_time)
@@ -173,4 +163,20 @@ pub fn limit_to(string:String,limit:usize)->String{
         return string[0..limit].to_owned();
     }
     string
+}
+
+pub fn process_str_num(mut str:&str) -> Option<String> {
+    
+    let mut processed_str:String = String::new();
+    for char in str.chars().collect::<Vec<char>>() {
+        if char.is_ascii_digit() {
+            processed_str.push(char);
+        }
+    }
+
+    if processed_str.is_empty() {
+        return None
+    }
+
+    Some(processed_str)
 }

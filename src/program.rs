@@ -9,8 +9,9 @@ use crate::win::ConsoleWindow;
 
 #[derive(Default)]
 pub struct CommandInfoBuffer {
+    pub pattern_name: Option<String>,
     pub input_pattern: PatternInfo,
-    pub all:Option<PatternDetectionType>,
+    pub pdt:Option<PatternDetectionType>,
     pub valid_daytypes:Option<Vec<DayType>>,
     pub index:Option<usize>,
 }

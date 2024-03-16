@@ -6,7 +6,8 @@ pub enum ArgError {
     DayFormat,
     InvalidDay,
     Empty,
-    InvalidPatternName
+    InvalidPatternName,
+    InvalidNumber,
 }
 
 impl std::fmt::Display for ArgError {
@@ -25,7 +26,8 @@ impl std::fmt::Display for ArgError {
             ),
             ArgError::Empty => write!(f, "{} You didn't pass anything!", "Error!".red()),
             ArgError::InvalidDay => write!(f, "{} No valid days were given!", "Error!".red()),
-            ArgError::InvalidPatternName => write!(f, "{} Could not find any pattern with that name!", "Error!".red())
+            ArgError::InvalidPatternName => write!(f, "{} Could not find any pattern with that name!", "Error!".red()),
+            ArgError::InvalidNumber => write!(f,"{} You didn't provide a valid number!","Error!".red()),
         }
     }
 }

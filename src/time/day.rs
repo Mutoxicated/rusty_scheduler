@@ -4,6 +4,8 @@ use crate::time::pattern::Pattern;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
+use super::PatternInfo;
+
 #[derive(PartialEq,Eq,Clone)]
 pub enum PatternDetectionType {
     All,
@@ -121,11 +123,36 @@ impl Day {
                 }
             }
             if let PatternDetectionType::Nth(x) = pdt {
-                if occurences >= x {
+                if occurences >= x || occurences == 0 {
                     return;
                 }
                 self.patterns.remove(ui);
             }
+        }
+    }
+
+    pub fn change_pattern(&mut self, name: String, pi:&PatternInfo, pdt: PatternDetectionType) {
+        let mut ui = 0;
+        let mut occurences = 0;
+        for i in 0..self.patterns.len() {
+            if self.patterns[i].name == name {
+                occurences += 1;
+                ui = i;
+                if let PatternDetectionType::Nth(x) = pdt {
+                    if x == occurences {
+                        self.patterns[ui].from(pi);
+                        return;
+                    }
+                }else {
+                    self.patterns[ui].from(pi);
+                }
+            }
+        }
+        if let PatternDetectionType::Nth(x) = pdt {
+            if occurences >= x || occurences == 0 {
+                return;
+            }
+            self.patterns[ui].from(pi);
         }
     }
 

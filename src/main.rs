@@ -83,6 +83,36 @@ fn main() {
     let program:Arc<Mutex<Program>> = Arc::new(Mutex::new(Program::new()));
     let program_info:Arc<Mutex<ProgramInfo>> = Arc::new(Mutex::new(ProgramInfo::new()));
 
+    let cloned_program2 = Arc::clone(&program);
+    let cloned_program3 = Arc::clone(&program);
+    let cloned_program4 = Arc::clone(&program);
+    let cloned_program5 = Arc::clone(&program);
+
+    //Setup System Tray
+    let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("rusty_sched")).unwrap();
+
+    tray.add_menu_item("About", move || {
+        cloned_program5.as_ref().lock().unwrap().console.about();
+    })
+    .unwrap();
+
+    tray.inner_mut().add_separator().unwrap();
+
+    tray.add_menu_item("Open", move || {
+        cloned_program2.as_ref().lock().unwrap().console.show();
+    })
+    .unwrap();
+
+    tray.add_menu_item("Hide", move || {
+        cloned_program3.as_ref().lock().unwrap().console.hide();
+    })
+    .unwrap();
+
+    tray.add_menu_item("Exit", move || {
+        cloned_program4.as_ref().lock().unwrap().exit();
+    })
+    .unwrap();    
+
     Data::read(program.as_ref().lock().unwrap().borrow_mut());
 
     let day_time = Local::now();
@@ -127,36 +157,7 @@ fn main() {
     println!("{}help{}","Type '".green(),"' if you're unfamiliar with the commands.".green());
 
     let cloned_program = Arc::clone(&program);
-    let cloned_program2 = Arc::clone(&program);
-    let cloned_program3 = Arc::clone(&program);
-    let cloned_program4 = Arc::clone(&program);
-    let cloned_program5 = Arc::clone(&program);
     let cloned_program_info = Arc::clone(&program_info);
-
-    //Setup System Tray
-    let mut tray = TrayItem::new("Rusty Scheduler", IconSource::Resource("rusty_sched")).unwrap();
-
-    tray.add_menu_item("About", move || {
-        cloned_program5.as_ref().lock().unwrap().console.about();
-    })
-    .unwrap();
-
-    tray.inner_mut().add_separator().unwrap();
-
-    tray.add_menu_item("Open", move || {
-        cloned_program2.as_ref().lock().unwrap().console.show();
-    })
-    .unwrap();
-
-    tray.add_menu_item("Hide", move || {
-        cloned_program3.as_ref().lock().unwrap().console.hide();
-    })
-    .unwrap();
-
-    tray.add_menu_item("Exit", move || {
-        cloned_program4.as_ref().lock().unwrap().exit();
-    })
-    .unwrap();
 
     thread::spawn(move || {
         let mut now:DateTime<Local>;
@@ -177,3 +178,11 @@ fn main() {
 
     Data::write(program.as_ref().lock().unwrap().borrow_mut());
 }
+
+/* TODO:
+
+1.Timeline of a given day
+2.Change pattern command
+3.Add mandatory pattern "sleep"
+
+*/

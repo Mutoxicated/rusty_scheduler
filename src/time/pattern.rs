@@ -5,12 +5,49 @@ use winrt_notification::{Toast,Duration};
 use std::cmp::Ordering;
 
 use crate::limit_to;
+#[derive(Default,Clone,PartialEq, Eq)]
+pub enum PatternInfoType<T> {
+    New(T),
+    Old,
+    #[default]
+    None
+}
+
+impl<T> PatternInfoType<T> {
+    pub fn unwrap(self)->T{
+        match self {
+            PatternInfoType::New(x) => x,
+            _ => {
+                panic!("Failed to unwrap PatternInfoType value")
+            }
+        }
+    }
+
+    pub fn as_ref(&self) -> Option<&T> {
+        match *self {
+            PatternInfoType::New(ref x) => Some(x),
+            _ => None,
+        }
+    }
+
+    // pub fn is_new(&self)->bool {
+    //     matches!(*self,PatternInfoType::New(_))
+    // }
+
+    // pub fn is_old(&self)->bool {
+    //     matches!(*self,PatternInfoType::Old)
+    // }
+
+    pub fn is_none(&self)->bool{
+        matches!(*self,PatternInfoType::None)
+    }
+}
 
 #[derive(Default,Clone)]
 pub struct PatternInfo {
-    pub name: Option<String>,
-    pub date_time:Option<NaiveDateTime>,
-    pub once: Option<bool>,
+    pub name: PatternInfoType<String>,
+    pub date_time:PatternInfoType<NaiveDateTime>,
+    pub once: PatternInfoType<bool>,
 }
 
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug)]
@@ -18,6 +55,7 @@ pub struct Pattern {
     pub name: String,
     pub date_time:NaiveDateTime,
     pub once: bool,
+    pub mandatory: bool
 }
 
 impl TryFrom<PatternInfo> for Pattern {
@@ -31,6 +69,7 @@ impl TryFrom<PatternInfo> for Pattern {
             name:value.name.unwrap(),
             date_time:value.date_time.unwrap(),
             once:value.once.unwrap(),
+            mandatory:false
         })
     }
 }
@@ -59,6 +98,27 @@ impl Pattern {
     //         once: false,
     //     }
     // }
+
+    pub fn from(&mut self,other:&PatternInfo){
+        println!("from");
+        if let PatternInfoType::New(value) = &other.name {
+            self.name = value.clone();
+        }
+        if let PatternInfoType::New(value) = &other.date_time {
+            println!("new time");
+            self.date_time = *value;
+        }
+        if let PatternInfoType::New(value) = &other.once {
+            self.once = *value;
+        }
+    }
+
+    pub fn change_once(&mut self, new_val:bool){
+        if self.mandatory {
+            return;
+        }
+        self.once = new_val;
+    }
 
     fn cmp_date_time(&self, other: &NaiveDateTime) -> Ordering {
         let comp = self.date_time.hour().cmp(&other.hour());
