@@ -1,37 +1,79 @@
 {
   "monday": {
     "day_type": "Monday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   },
   "tuesday": {
     "day_type": "Tuesday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   },
   "wednesday": {
     "day_type": "Wednesday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   },
   "thursday": {
     "day_type": "Thursday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   },
   "friday": {
     "day_type": "Friday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   },
   "saturday": {
     "day_type": "Saturday",
     "patterns": [
       {
-        "name": "o",
-        "date_time": "2024-03-16T20:00:00",
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
         "once": false,
-        "mandatory": false
+        "mandatory": true
       }
     ]
   },
   "sunday": {
     "day_type": "Sunday",
-    "patterns": []
+    "patterns": [
+      {
+        "name": "Sleep",
+        "date_time": "2024-03-18T23:30:00",
+        "once": false,
+        "mandatory": true
+      }
+    ]
   }
 }

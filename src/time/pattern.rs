@@ -91,14 +91,6 @@ impl Ord for Pattern {
 }
 
 impl Pattern {
-    // pub fn new_empty() -> Self {
-    //     Self {
-    //         name: String::new(),
-    //         date_time:NaiveDateTime::MAX,
-    //         once: false,
-    //     }
-    // }
-
     pub fn from(&mut self,other:&PatternInfo){
         println!("from");
         if let PatternInfoType::New(value) = &other.name {
@@ -111,13 +103,6 @@ impl Pattern {
         if let PatternInfoType::New(value) = &other.once {
             self.once = *value;
         }
-    }
-
-    pub fn change_once(&mut self, new_val:bool){
-        if self.mandatory {
-            return;
-        }
-        self.once = new_val;
     }
 
     fn cmp_date_time(&self, other: &NaiveDateTime) -> Ordering {

@@ -182,7 +182,7 @@ fn main() {
 /* TODO:
 
 1.Timeline of a given day
-2.Change pattern command
-3.Add mandatory pattern "sleep"
+2.Change pattern command CHECK
+3.Add mandatory pattern "sleep" CHECK
 
 */

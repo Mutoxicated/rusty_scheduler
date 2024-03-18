@@ -1,7 +1,7 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use crate::time::pattern::Pattern;
-use chrono::NaiveDateTime;
+use chrono::{Local, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
 use super::PatternInfo;
@@ -41,7 +41,14 @@ impl Day {
     pub fn new(day_type: DayType) -> Self {
         Self {
             day_type,
-            patterns: Vec::new(),
+            patterns: vec![
+                Pattern {
+                    name:"Sleep".to_owned(),
+                    date_time: NaiveDateTime::new(Local::now().date_naive(),NaiveTime::from_str("23:30").unwrap()),
+                    once: false,
+                    mandatory: true
+                }
+            ],
         }
     }
 
@@ -100,34 +107,45 @@ impl Day {
         self.patterns.sort();
     }
 
+    fn remove_pat(&mut self, index:usize){
+        if !self.patterns[index].mandatory {
+            self.patterns.remove(index);
+        }
+    }
+
     pub fn remove_pattern(&mut self, name: String, pdt: PatternDetectionType) {
-        if pdt == PatternDetectionType::All {
-            if name.is_empty() {
-                self.patterns.clear();
+        let mut ui = 0;
+        let mut occurences = 0;
+        for i in 0..self.patterns.len() {
+            if self.patterns[i].name == name {
+                occurences += 1;
+                ui = i;
+                if let PatternDetectionType::Nth(x) = pdt {
+                    if x == occurences {
+                        self.remove_pat(ui);
+                        return;
+                    }
+                }else {
+                    self.remove_pat(i)
+                }
+            }
+        }
+        if let PatternDetectionType::Nth(x) = pdt {
+            if occurences >= x || occurences == 0 {
                 return;
             }
-            self.patterns.retain(|x| x.name != name);
+            self.patterns.remove(ui);
+        }
+    }
+
+    fn change_pat(&mut self, index:usize, pi: &PatternInfo){
+        if !self.patterns[index].mandatory {
+            self.patterns[index].from(pi);
         }else {
-            let mut ui = 0;
-            let mut occurences = 0;
-            for i in 0..self.patterns.len() {
-                if self.patterns[i].name == name {
-                    occurences += 1;
-                    ui = i;
-                    if let PatternDetectionType::Nth(x) = pdt {
-                        if x == occurences {
-                            self.patterns.remove(ui);
-                            return;
-                        }
-                    }
-                }
-            }
-            if let PatternDetectionType::Nth(x) = pdt {
-                if occurences >= x || occurences == 0 {
-                    return;
-                }
-                self.patterns.remove(ui);
-            }
+            let oldname = self.patterns[index].name.clone();
+            self.patterns[index].from(pi);
+            self.patterns[index].name = oldname;
+            self.patterns[index].once = false;
         }
     }
 
@@ -140,11 +158,11 @@ impl Day {
                 ui = i;
                 if let PatternDetectionType::Nth(x) = pdt {
                     if x == occurences {
-                        self.patterns[ui].from(pi);
+                        self.change_pat(ui,pi);
                         return;
                     }
                 }else {
-                    self.patterns[ui].from(pi);
+                    self.change_pat(i,pi);
                 }
             }
         }

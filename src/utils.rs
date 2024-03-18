@@ -93,7 +93,7 @@ pub fn format_time(time: &str) -> Result<String, ArgError> {
     let mut formatted_time: String = String::from(time);
 
     if formatted_time.len() == 1 {
-        if !formatted_time.chars().nth(0).unwrap().is_ascii_digit(){
+        if !formatted_time.chars().next().unwrap().is_ascii_digit(){
             return Err(ArgError::TimeFormat);
         }
         let mut full_str:String = "0".to_string();
@@ -165,7 +165,7 @@ pub fn limit_to(string:String,limit:usize)->String{
     string
 }
 
-pub fn process_str_num(mut str:&str) -> Option<String> {
+pub fn process_str_num(str:&str) -> Option<String> {
     
     let mut processed_str:String = String::new();
     for char in str.chars().collect::<Vec<char>>() {

@@ -419,8 +419,9 @@ impl ScheduleData {
 
         if pri.cmib.pdt.as_ref().unwrap() == &PatternDetectionType::All {
             println!(
-                "All {} removed from {:?}!",
+                "All {} named '{}' removed from {:?}!",
                 "Patterns".yellow(),
+                pri.cmib.pattern_name.as_ref().unwrap(),
                 pri.cmib.valid_daytypes.as_ref().unwrap()
             );
         }else {
